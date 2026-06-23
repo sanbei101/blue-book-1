@@ -72,3 +72,51 @@ DELETE FROM posts WHERE id = @id AND user_id = @user_id;
 
 -- name: IncrementViewCount :exec
 UPDATE posts SET view_count = view_count + 1 WHERE id = @id;
+
+-- name: DeletePostMediaByPostID :exec
+DELETE FROM post_media WHERE post_id = @post_id;
+
+-- name: CreateComment :one
+INSERT INTO comments (
+    id, post_id, user_id, parent_id, content
+) VALUES (
+    @id, @post_id, @user_id, @parent_id, @content
+) RETURNING *;
+
+-- name: ListCommentsByPostID :many
+SELECT
+    c.id, c.post_id, c.user_id, c.parent_id, c.content, c.like_count, c.created_at,
+    u.username AS author_username, u.avatar_url AS author_avatar
+FROM comments c
+JOIN users u ON c.user_id = u.id
+WHERE c.post_id = @post_id
+ORDER BY c.created_at ASC
+LIMIT @limit_count OFFSET @offset_count;
+
+-- name: ToggleFollow :exec
+INSERT INTO follows (
+    follower_id, following_id
+) VALUES (
+    @follower_id, @following_id
+) ON CONFLICT (follower_id, following_id) DO NOTHING;
+
+-- name: Unfollow :exec
+DELETE FROM follows WHERE follower_id = @follower_id AND following_id = @following_id;
+
+-- name: ListFollowers :many
+SELECT
+    u.id, u.username, u.avatar_url, u.bio
+FROM follows f
+JOIN users u ON f.follower_id = u.id
+WHERE f.following_id = @following_id
+ORDER BY f.created_at DESC
+LIMIT @limit_count OFFSET @offset_count;
+
+-- name: ListFollowing :many
+SELECT
+    u.id, u.username, u.avatar_url, u.bio
+FROM follows f
+JOIN users u ON f.following_id = u.id
+WHERE f.follower_id = @follower_id
+ORDER BY f.created_at DESC
+LIMIT @limit_count OFFSET @offset_count;

@@ -13,6 +13,43 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const createComment = `-- name: CreateComment :one
+INSERT INTO comments (
+    id, post_id, user_id, parent_id, content
+) VALUES (
+    $1, $2, $3, $4, $5
+) RETURNING id, post_id, user_id, parent_id, content, like_count, created_at
+`
+
+type CreateCommentParams struct {
+	ID       uuid.UUID  `json:"id"`
+	PostID   uuid.UUID  `json:"post_id"`
+	UserID   uuid.UUID  `json:"user_id"`
+	ParentID *uuid.UUID `json:"parent_id"`
+	Content  string     `json:"content"`
+}
+
+func (q *Queries) CreateComment(ctx context.Context, arg CreateCommentParams) (Comment, error) {
+	row := q.db.QueryRow(ctx, createComment,
+		arg.ID,
+		arg.PostID,
+		arg.UserID,
+		arg.ParentID,
+		arg.Content,
+	)
+	var i Comment
+	err := row.Scan(
+		&i.ID,
+		&i.PostID,
+		&i.UserID,
+		&i.ParentID,
+		&i.Content,
+		&i.LikeCount,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const createPost = `-- name: CreatePost :one
 INSERT INTO posts (
     id, user_id, title, content
@@ -51,7 +88,7 @@ func (q *Queries) CreatePost(ctx context.Context, arg CreatePostParams) (Post, e
 type CreatePostMediaParams struct {
 	ID        uuid.UUID     `json:"id"`
 	PostID    uuid.UUID     `json:"post_id"`
-	MediaUrl  string        `json:"media_url"`
+	MediaURL  string        `json:"media_url"`
 	MediaType MediaTypeEnum `json:"media_type"`
 	SortOrder int16         `json:"sort_order"`
 }
@@ -68,7 +105,7 @@ type CreateUserParams struct {
 	ID           uuid.UUID   `json:"id"`
 	Username     string      `json:"username"`
 	PasswordHash string      `json:"password_hash"`
-	AvatarUrl    pgtype.Text `json:"avatar_url"`
+	AvatarURL    pgtype.Text `json:"avatar_url"`
 	Bio          pgtype.Text `json:"bio"`
 }
 
@@ -77,7 +114,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		arg.ID,
 		arg.Username,
 		arg.PasswordHash,
-		arg.AvatarUrl,
+		arg.AvatarURL,
 		arg.Bio,
 	)
 	var i User
@@ -85,7 +122,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.ID,
 		&i.Username,
 		&i.PasswordHash,
-		&i.AvatarUrl,
+		&i.AvatarURL,
 		&i.Bio,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -104,6 +141,15 @@ type DeletePostParams struct {
 
 func (q *Queries) DeletePost(ctx context.Context, arg DeletePostParams) error {
 	_, err := q.db.Exec(ctx, deletePost, arg.ID, arg.UserID)
+	return err
+}
+
+const deletePostMediaByPostID = `-- name: DeletePostMediaByPostID :exec
+DELETE FROM post_media WHERE post_id = $1
+`
+
+func (q *Queries) DeletePostMediaByPostID(ctx context.Context, postID uuid.UUID) error {
+	_, err := q.db.Exec(ctx, deletePostMediaByPostID, postID)
 	return err
 }
 
@@ -163,7 +209,7 @@ func (q *Queries) GetPostMediaByPostID(ctx context.Context, postID uuid.UUID) ([
 		if err := rows.Scan(
 			&i.ID,
 			&i.PostID,
-			&i.MediaUrl,
+			&i.MediaURL,
 			&i.MediaType,
 			&i.SortOrder,
 			&i.CreatedAt,
@@ -189,7 +235,7 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 		&i.ID,
 		&i.Username,
 		&i.PasswordHash,
-		&i.AvatarUrl,
+		&i.AvatarURL,
 		&i.Bio,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -208,7 +254,7 @@ func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User,
 		&i.ID,
 		&i.Username,
 		&i.PasswordHash,
-		&i.AvatarUrl,
+		&i.AvatarURL,
 		&i.Bio,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -223,6 +269,161 @@ UPDATE posts SET view_count = view_count + 1 WHERE id = $1
 func (q *Queries) IncrementViewCount(ctx context.Context, id uuid.UUID) error {
 	_, err := q.db.Exec(ctx, incrementViewCount, id)
 	return err
+}
+
+const listCommentsByPostID = `-- name: ListCommentsByPostID :many
+SELECT
+    c.id, c.post_id, c.user_id, c.parent_id, c.content, c.like_count, c.created_at,
+    u.username AS author_username, u.avatar_url AS author_avatar
+FROM comments c
+JOIN users u ON c.user_id = u.id
+WHERE c.post_id = $1
+ORDER BY c.created_at ASC
+LIMIT $3 OFFSET $2
+`
+
+type ListCommentsByPostIDParams struct {
+	PostID      uuid.UUID `json:"post_id"`
+	OffsetCount int32     `json:"offset_count"`
+	LimitCount  int32     `json:"limit_count"`
+}
+
+type ListCommentsByPostIDRow struct {
+	ID             uuid.UUID   `json:"id"`
+	PostID         uuid.UUID   `json:"post_id"`
+	UserID         uuid.UUID   `json:"user_id"`
+	ParentID       *uuid.UUID  `json:"parent_id"`
+	Content        string      `json:"content"`
+	LikeCount      int32       `json:"like_count"`
+	CreatedAt      time.Time   `json:"created_at"`
+	AuthorUsername string      `json:"author_username"`
+	AuthorAvatar   pgtype.Text `json:"author_avatar"`
+}
+
+func (q *Queries) ListCommentsByPostID(ctx context.Context, arg ListCommentsByPostIDParams) ([]ListCommentsByPostIDRow, error) {
+	rows, err := q.db.Query(ctx, listCommentsByPostID, arg.PostID, arg.OffsetCount, arg.LimitCount)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListCommentsByPostIDRow{}
+	for rows.Next() {
+		var i ListCommentsByPostIDRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.PostID,
+			&i.UserID,
+			&i.ParentID,
+			&i.Content,
+			&i.LikeCount,
+			&i.CreatedAt,
+			&i.AuthorUsername,
+			&i.AuthorAvatar,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listFollowers = `-- name: ListFollowers :many
+SELECT
+    u.id, u.username, u.avatar_url, u.bio
+FROM follows f
+JOIN users u ON f.follower_id = u.id
+WHERE f.following_id = $1
+ORDER BY f.created_at DESC
+LIMIT $3 OFFSET $2
+`
+
+type ListFollowersParams struct {
+	FollowingID uuid.UUID `json:"following_id"`
+	OffsetCount int32     `json:"offset_count"`
+	LimitCount  int32     `json:"limit_count"`
+}
+
+type ListFollowersRow struct {
+	ID        uuid.UUID   `json:"id"`
+	Username  string      `json:"username"`
+	AvatarURL pgtype.Text `json:"avatar_url"`
+	Bio       pgtype.Text `json:"bio"`
+}
+
+func (q *Queries) ListFollowers(ctx context.Context, arg ListFollowersParams) ([]ListFollowersRow, error) {
+	rows, err := q.db.Query(ctx, listFollowers, arg.FollowingID, arg.OffsetCount, arg.LimitCount)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListFollowersRow{}
+	for rows.Next() {
+		var i ListFollowersRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Username,
+			&i.AvatarURL,
+			&i.Bio,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listFollowing = `-- name: ListFollowing :many
+SELECT
+    u.id, u.username, u.avatar_url, u.bio
+FROM follows f
+JOIN users u ON f.following_id = u.id
+WHERE f.follower_id = $1
+ORDER BY f.created_at DESC
+LIMIT $3 OFFSET $2
+`
+
+type ListFollowingParams struct {
+	FollowerID  uuid.UUID `json:"follower_id"`
+	OffsetCount int32     `json:"offset_count"`
+	LimitCount  int32     `json:"limit_count"`
+}
+
+type ListFollowingRow struct {
+	ID        uuid.UUID   `json:"id"`
+	Username  string      `json:"username"`
+	AvatarURL pgtype.Text `json:"avatar_url"`
+	Bio       pgtype.Text `json:"bio"`
+}
+
+func (q *Queries) ListFollowing(ctx context.Context, arg ListFollowingParams) ([]ListFollowingRow, error) {
+	rows, err := q.db.Query(ctx, listFollowing, arg.FollowerID, arg.OffsetCount, arg.LimitCount)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListFollowingRow{}
+	for rows.Next() {
+		var i ListFollowingRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Username,
+			&i.AvatarURL,
+			&i.Bio,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const listPostsByUser = `-- name: ListPostsByUser :many
@@ -338,6 +539,24 @@ func (q *Queries) ListPostsFeed(ctx context.Context, arg ListPostsFeedParams) ([
 	return items, nil
 }
 
+const toggleFollow = `-- name: ToggleFollow :exec
+INSERT INTO follows (
+    follower_id, following_id
+) VALUES (
+    $1, $2
+) ON CONFLICT (follower_id, following_id) DO NOTHING
+`
+
+type ToggleFollowParams struct {
+	FollowerID  uuid.UUID `json:"follower_id"`
+	FollowingID uuid.UUID `json:"following_id"`
+}
+
+func (q *Queries) ToggleFollow(ctx context.Context, arg ToggleFollowParams) error {
+	_, err := q.db.Exec(ctx, toggleFollow, arg.FollowerID, arg.FollowingID)
+	return err
+}
+
 const toggleLike = `-- name: ToggleLike :exec
 INSERT INTO likes (
     id, user_id, target_id, target_type
@@ -364,13 +583,27 @@ func (q *Queries) ToggleLike(ctx context.Context, arg ToggleLikeParams) error {
 	return err
 }
 
+const unfollow = `-- name: Unfollow :exec
+DELETE FROM follows WHERE follower_id = $1 AND following_id = $2
+`
+
+type UnfollowParams struct {
+	FollowerID  uuid.UUID `json:"follower_id"`
+	FollowingID uuid.UUID `json:"following_id"`
+}
+
+func (q *Queries) Unfollow(ctx context.Context, arg UnfollowParams) error {
+	_, err := q.db.Exec(ctx, unfollow, arg.FollowerID, arg.FollowingID)
+	return err
+}
+
 const updateUser = `-- name: UpdateUser :one
 UPDATE users SET username = $1, avatar_url = $2, bio = $3, updated_at = NOW() WHERE id = $4 RETURNING id, username, password_hash, avatar_url, bio, created_at, updated_at
 `
 
 type UpdateUserParams struct {
 	Username  string      `json:"username"`
-	AvatarUrl pgtype.Text `json:"avatar_url"`
+	AvatarURL pgtype.Text `json:"avatar_url"`
 	Bio       pgtype.Text `json:"bio"`
 	ID        uuid.UUID   `json:"id"`
 }
@@ -378,7 +611,7 @@ type UpdateUserParams struct {
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error) {
 	row := q.db.QueryRow(ctx, updateUser,
 		arg.Username,
-		arg.AvatarUrl,
+		arg.AvatarURL,
 		arg.Bio,
 		arg.ID,
 	)
@@ -387,7 +620,7 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		&i.ID,
 		&i.Username,
 		&i.PasswordHash,
-		&i.AvatarUrl,
+		&i.AvatarURL,
 		&i.Bio,
 		&i.CreatedAt,
 		&i.UpdatedAt,

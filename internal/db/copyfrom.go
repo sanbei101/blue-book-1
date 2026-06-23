@@ -31,7 +31,7 @@ func (r iteratorForCreatePostMedia) Values() ([]interface{}, error) {
 	return []interface{}{
 		r.rows[0].ID,
 		r.rows[0].PostID,
-		r.rows[0].MediaUrl,
+		r.rows[0].MediaURL,
 		r.rows[0].MediaType,
 		r.rows[0].SortOrder,
 	}, nil

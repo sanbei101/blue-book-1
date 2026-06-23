@@ -92,7 +92,7 @@ type Post struct {
 type PostMedium struct {
 	ID        uuid.UUID     `json:"id"`
 	PostID    uuid.UUID     `json:"post_id"`
-	MediaUrl  string        `json:"media_url"`
+	MediaURL  string        `json:"media_url"`
 	MediaType MediaTypeEnum `json:"media_type"`
 	SortOrder int16         `json:"sort_order"`
 	CreatedAt time.Time     `json:"created_at"`
@@ -102,7 +102,7 @@ type User struct {
 	ID           uuid.UUID   `json:"id"`
 	Username     string      `json:"username"`
 	PasswordHash string      `json:"password_hash"`
-	AvatarUrl    pgtype.Text `json:"avatar_url"`
+	AvatarURL    pgtype.Text `json:"avatar_url"`
 	Bio          pgtype.Text `json:"bio"`
 	CreatedAt    time.Time   `json:"created_at"`
 	UpdatedAt    time.Time   `json:"updated_at"`

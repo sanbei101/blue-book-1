@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
+	"errors"
 	"net/http"
-	"os"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/phuslu/log"
@@ -14,22 +14,24 @@ import (
 
 func main() {
 	ctx := context.Background()
-	pool, err := pgxpool.New(ctx, "postgres://postgres:password@localhost:5432/blue_book?sslmode=disable")
+
+	pool, err := pgxpool.New(
+		ctx,
+		"postgres://postgres:password@localhost:5432/blue_book?sslmode=disable",
+	)
 	if err != nil {
-		log.Fatal().Err(err).Msg("无法连接数据库")
+		log.Error().Err(err).Msg("无法连接数据库")
+		return
 	}
 	defer pool.Close()
 
 	store := db.NewStore(pool)
-
 	router := api.RegisterRoutes(store)
 
-	log.Info().Msg("小蓝书后端服务启动成功,正在监听 :8080...")
+	log.Info().Msg("正在监听 :8080...")
 
-	if err := http.ListenAndServe(":8080", router); err != nil {
-		if err := http.ListenAndServe(":8080", router); err != nil {
-			log.Error().Err(err).Msg("服务异常关闭")
-			os.Exit(1)
-		}
+	if err := http.ListenAndServe(":8080", router); err != nil &&
+		!errors.Is(err, http.ErrServerClosed) {
+		log.Error().Err(err).Msg("服务异常关闭")
 	}
 }

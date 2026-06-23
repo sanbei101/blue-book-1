@@ -5,6 +5,9 @@ sql:
     schema: "sqlc/schema.sql"
     gen:
       go:
+        initialisms:
+          - "id"
+          - "url"
         package: "db"
         out: "internal/db"
         sql_package: "pgx/v5"

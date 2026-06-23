@@ -46,7 +46,7 @@ type createPostRequest struct {
 	Media   []createMediaItem `json:"media"`
 }
 type createMediaItem struct {
-	MediaUrl  string `json:"media_url"  validate:"required"`
+	MediaURL  string `json:"media_url"  validate:"required"`
 	MediaType string `json:"media_type" validate:"required,oneof=image video"`
 	SortOrder int16  `json:"sort_order"`
 }
@@ -68,12 +68,12 @@ type listPostsResponse struct {
 type authorResponse struct {
 	ID        uuid.UUID `json:"id"`
 	Username  string    `json:"username"`
-	AvatarUrl string    `json:"avatar_url,omitempty"`
+	AvatarURL string    `json:"avatar_url,omitempty"`
 }
 
 type mediaResponse struct {
 	ID        uuid.UUID `json:"id"`
-	MediaUrl  string    `json:"media_url"`
+	MediaURL  string    `json:"media_url"`
 	MediaType string    `json:"media_type"`
 	SortOrder int16     `json:"sort_order"`
 }
@@ -81,15 +81,15 @@ type mediaResponse struct {
 func toAuthorFromFeed(authorID uuid.UUID, authorUsername string, authorAvatar pgtype.Text) authorResponse {
 	a := authorResponse{ID: authorID, Username: authorUsername}
 	if authorAvatar.Valid {
-		a.AvatarUrl = authorAvatar.String
+		a.AvatarURL = authorAvatar.String
 	}
 	return a
 }
 
-func toMediaResponse(m db.PostMedium) mediaResponse {
+func toMediaResponse(m *db.PostMedium) mediaResponse {
 	return mediaResponse{
 		ID:        m.ID,
-		MediaUrl:  m.MediaUrl,
+		MediaURL:  m.MediaURL,
 		MediaType: string(m.MediaType),
 		SortOrder: m.SortOrder,
 	}
@@ -126,7 +126,7 @@ func (h *PostHandler) Create(w http.ResponseWriter, r *http.Request) {
 				params[i] = db.CreatePostMediaParams{
 					ID:        uuid.New(),
 					PostID:    post.ID,
-					MediaUrl:  m.MediaUrl,
+					MediaURL:  m.MediaURL,
 					MediaType: mediaType,
 					SortOrder: m.SortOrder,
 				}
@@ -159,14 +159,14 @@ func (h *PostHandler) ListFeed(w http.ResponseWriter, r *http.Request) {
 	}
 
 	posts := make([]listPostsResponse, 0, len(rows))
-	for _, row := range rows {
+	for i := range rows {
 		posts = append(posts, listPostsResponse{
-			ID:        row.ID,
-			Title:     row.Title,
-			Content:   row.Content,
-			ViewCount: row.ViewCount,
-			CreatedAt: row.CreatedAt,
-			Author:    toAuthorFromFeed(row.AuthorID, row.AuthorUsername, row.AuthorAvatar),
+			ID:        rows[i].ID,
+			Title:     rows[i].Title,
+			Content:   rows[i].Content,
+			ViewCount: rows[i].ViewCount,
+			CreatedAt: rows[i].CreatedAt,
+			Author:    toAuthorFromFeed(rows[i].AuthorID, rows[i].AuthorUsername, rows[i].AuthorAvatar),
 		})
 	}
 
@@ -199,8 +199,8 @@ func (h *PostHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	mediaList := make([]mediaResponse, 0, len(media))
-	for _, m := range media {
-		mediaList = append(mediaList, toMediaResponse(m))
+	for i := range media {
+		mediaList = append(mediaList, toMediaResponse(&media[i]))
 	}
 
 	render.Success(w, "查询成功", listPostsResponse{
@@ -229,14 +229,14 @@ func (h *PostHandler) ListByUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	posts := make([]listPostsResponse, 0, len(rows))
-	for _, row := range rows {
+	for i := range rows {
 		posts = append(posts, listPostsResponse{
-			ID:        row.ID,
-			Title:     row.Title,
-			Content:   row.Content,
-			ViewCount: row.ViewCount,
-			CreatedAt: row.CreatedAt,
-			Author:    toAuthorFromFeed(row.AuthorID, row.AuthorUsername, row.AuthorAvatar),
+			ID:        rows[i].ID,
+			Title:     rows[i].Title,
+			Content:   rows[i].Content,
+			ViewCount: rows[i].ViewCount,
+			CreatedAt: rows[i].CreatedAt,
+			Author:    toAuthorFromFeed(rows[i].AuthorID, rows[i].AuthorUsername, rows[i].AuthorAvatar),
 		})
 	}
 

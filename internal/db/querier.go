@@ -11,20 +11,27 @@ import (
 )
 
 type Querier interface {
+	CreateComment(ctx context.Context, arg CreateCommentParams) (Comment, error)
 	CreatePost(ctx context.Context, arg CreatePostParams) (Post, error)
 	CreatePostMedia(ctx context.Context, arg []CreatePostMediaParams) (int64, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	DeletePost(ctx context.Context, arg DeletePostParams) error
+	DeletePostMediaByPostID(ctx context.Context, postID uuid.UUID) error
 	GetPostByID(ctx context.Context, id uuid.UUID) (GetPostByIDRow, error)
 	GetPostMediaByPostID(ctx context.Context, postID uuid.UUID) ([]PostMedium, error)
 	GetUserByID(ctx context.Context, id uuid.UUID) (User, error)
 	GetUserByUsername(ctx context.Context, username string) (User, error)
 	IncrementViewCount(ctx context.Context, id uuid.UUID) error
+	ListCommentsByPostID(ctx context.Context, arg ListCommentsByPostIDParams) ([]ListCommentsByPostIDRow, error)
+	ListFollowers(ctx context.Context, arg ListFollowersParams) ([]ListFollowersRow, error)
+	ListFollowing(ctx context.Context, arg ListFollowingParams) ([]ListFollowingRow, error)
 	ListPostsByUser(ctx context.Context, arg ListPostsByUserParams) ([]ListPostsByUserRow, error)
 	// 获取首页信息流
 	ListPostsFeed(ctx context.Context, arg ListPostsFeedParams) ([]ListPostsFeedRow, error)
+	ToggleFollow(ctx context.Context, arg ToggleFollowParams) error
 	// 点赞逻辑
 	ToggleLike(ctx context.Context, arg ToggleLikeParams) error
+	Unfollow(ctx context.Context, arg UnfollowParams) error
 	UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error)
 }
 

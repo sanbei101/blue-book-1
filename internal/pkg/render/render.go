@@ -82,9 +82,9 @@ func ReadBody[T any](w http.ResponseWriter, r *http.Request) (T, error) {
 
 	if err := validate.Struct(body); err != nil {
 		errs := validator.TranslateValidationErrors(err, "zh")
-		var errorMsgs []string
-		for _, e := range errs {
-			errorMsgs = append(errorMsgs, e.Field+": "+e.Message)
+		errorMsgs := make([]string, 0, len(errs))
+		for i := range errs {
+			errorMsgs = append(errorMsgs, errs[i].Field+": "+errs[i].Message)
 		}
 		fullErrorMsg := strings.Join(errorMsgs, "; ")
 		Error(w, http.StatusBadRequest, fullErrorMsg)
