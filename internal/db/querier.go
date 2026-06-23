@@ -26,10 +26,8 @@ type Querier interface {
 	ListFollowers(ctx context.Context, arg ListFollowersParams) ([]ListFollowersRow, error)
 	ListFollowing(ctx context.Context, arg ListFollowingParams) ([]ListFollowingRow, error)
 	ListPostsByUser(ctx context.Context, arg ListPostsByUserParams) ([]ListPostsByUserRow, error)
-	// 获取首页信息流
 	ListPostsFeed(ctx context.Context, arg ListPostsFeedParams) ([]ListPostsFeedRow, error)
 	ToggleFollow(ctx context.Context, arg ToggleFollowParams) error
-	// 点赞逻辑
 	ToggleLike(ctx context.Context, arg ToggleLikeParams) error
 	Unfollow(ctx context.Context, arg UnfollowParams) error
 	UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error)
