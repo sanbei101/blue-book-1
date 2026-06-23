@@ -95,6 +95,16 @@ func toMediaResponse(m *db.PostMedium) mediaResponse {
 	}
 }
 
+// Create 创建帖子
+// @Summary  创建帖子
+// @Tags     posts
+// @Security BearerAuth
+// @Accept   json
+// @Param    body body     createPostRequest true "帖子内容"
+// @Success  200  {object} createPostResponse
+// @Failure  400  {object} render.errorResponse
+// @Failure  500  {object} render.errorResponse
+// @Router   /posts [post]
 func (h *PostHandler) Create(w http.ResponseWriter, r *http.Request) {
 	body, err := render.ReadBody[createPostRequest](w, r)
 	if err != nil {
@@ -146,7 +156,15 @@ func (h *PostHandler) Create(w http.ResponseWriter, r *http.Request) {
 	render.Success(w, "创建成功", createPostResponse{ID: created.ID})
 }
 
-// ---- 首页信息流 ----
+// ListFeed 首页信息流
+// @Summary  获取帖子列表
+// @Tags     posts
+// @Produce  json
+// @Param    page      query    int false "页码"     default(1)
+// @Param    page_size query    int false "每页数量" default(20)
+// @Success  200       {array}  listPostsResponse
+// @Failure  500       {object} render.errorResponse
+// @Router   /posts [get]
 func (h *PostHandler) ListFeed(w http.ResponseWriter, r *http.Request) {
 	offset, pageSize := Pagination(r, 1, 20, 50)
 	rows, err := h.store.ListPostsFeed(r.Context(), db.ListPostsFeedParams{
@@ -173,6 +191,15 @@ func (h *PostHandler) ListFeed(w http.ResponseWriter, r *http.Request) {
 	render.Success(w, "查询成功", posts)
 }
 
+// GetByID 获取帖子详情
+// @Summary  获取帖子详情
+// @Tags     posts
+// @Produce  json
+// @Param    id  path     string true "帖子 ID"
+// @Success  200 {object} listPostsResponse
+// @Failure  400 {object} render.errorResponse
+// @Failure  404 {object} render.errorResponse
+// @Router   /posts/{id} [get]
 func (h *PostHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := uuid.Parse(idStr)
@@ -214,7 +241,16 @@ func (h *PostHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// ---- 某用户的帖子列表 ----
+// ListByUser 用户帖子列表
+// @Summary  获取指定用户的帖子列表
+// @Tags     posts
+// @Security BearerAuth
+// @Produce  json
+// @Param    page      query    int false "页码"     default(1)
+// @Param    page_size query    int false "每页数量" default(20)
+// @Success  200       {array}  listPostsResponse
+// @Failure  500       {object} render.errorResponse
+// @Router   /posts/user/{userID} [get]
 func (h *PostHandler) ListByUser(w http.ResponseWriter, r *http.Request) {
 	userID := jwt.GetUserIDFromContext(r)
 	offset, pageSize := Pagination(r, 1, 20, 50)
@@ -243,7 +279,16 @@ func (h *PostHandler) ListByUser(w http.ResponseWriter, r *http.Request) {
 	render.Success(w, "查询成功", posts)
 }
 
-// ---- 删除帖子 ----
+// Delete 删除帖子
+// @Summary  删除帖子
+// @Tags     posts
+// @Security BearerAuth
+// @Produce  json
+// @Param    id  path     string true "帖子 ID"
+// @Success  204 {object} render.ResponseWithoutData
+// @Failure  400 {object} render.errorResponse
+// @Failure  500 {object} render.errorResponse
+// @Router   /posts/{id} [delete]
 func (h *PostHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := uuid.Parse(idStr)

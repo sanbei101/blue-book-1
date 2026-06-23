@@ -10,6 +10,14 @@ import (
 	"github.com/sanbei101/blue-book/internal/pkg/jwt"
 )
 
+// @title       小蓝书 API
+// @version     1.0
+// @description 小蓝书后端接口文档
+// @BasePath    /api/v1
+// @accept      json
+// @produce     json
+// @schemes     http
+// @securitydefinitions.bearerauth BearerAuth
 func RegisterRoutes(store *db.Store) *chi.Mux {
 	r := chi.NewRouter()
 	r.Use(middleware.Recoverer)
