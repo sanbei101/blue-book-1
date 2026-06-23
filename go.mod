@@ -3,6 +3,7 @@ module github.com/sanbei101/blue-book
 go 1.26.4
 
 require (
+	github.com/cristalhq/jwt/v5 v5.4.0
 	github.com/go-chi/chi/v5 v5.3.0
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgx/v5 v5.10.0

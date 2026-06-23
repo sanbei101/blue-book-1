@@ -1,11 +1,13 @@
-package cmd
+package main
 
 import (
 	"context"
 	"net/http"
+	"os"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/phuslu/log"
+
 	"github.com/sanbei101/blue-book/internal/api"
 	"github.com/sanbei101/blue-book/internal/db"
 )
@@ -25,6 +27,9 @@ func main() {
 	log.Info().Msg("小蓝书后端服务启动成功,正在监听 :8080...")
 
 	if err := http.ListenAndServe(":8080", router); err != nil {
-		log.Fatal().Err(err).Msg("服务异常关闭")
+		if err := http.ListenAndServe(":8080", router); err != nil {
+			log.Error().Err(err).Msg("服务异常关闭")
+			os.Exit(1)
+		}
 	}
 }

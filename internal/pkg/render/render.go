@@ -21,6 +21,11 @@ type Response[T any] struct {
 	Data T      `json:"data,omitempty"`
 }
 
+type ResponseWithoutData struct {
+	Code int    `json:"code"`
+	Msg  string `json:"msg"`
+}
+
 type errorResponse struct {
 	Code int    `json:"code"`
 	Msg  string `json:"msg"`
@@ -36,6 +41,19 @@ func Success[T any](w http.ResponseWriter, msg string, data T) {
 	})
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to write success response")
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+	}
+}
+
+func SuccessNoData(w http.ResponseWriter, code int, msg string) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+	err := json.MarshalWrite(w, ResponseWithoutData{
+		Code: code,
+		Msg:  msg,
+	})
+	if err != nil {
+		log.Error().Err(err).Msg("Failed to write success response without data")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 	}
 }

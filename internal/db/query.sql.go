@@ -93,6 +93,91 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	return i, err
 }
 
+const deletePost = `-- name: DeletePost :exec
+DELETE FROM posts WHERE id = $1 AND user_id = $2
+`
+
+type DeletePostParams struct {
+	ID     uuid.UUID `json:"id"`
+	UserID uuid.UUID `json:"user_id"`
+}
+
+func (q *Queries) DeletePost(ctx context.Context, arg DeletePostParams) error {
+	_, err := q.db.Exec(ctx, deletePost, arg.ID, arg.UserID)
+	return err
+}
+
+const getPostByID = `-- name: GetPostByID :one
+SELECT
+    p.id, p.user_id, p.title, p.content, p.view_count, p.created_at, p.updated_at,
+    u.id AS author_id, u.username AS author_username, u.avatar_url AS author_avatar
+FROM posts p
+JOIN users u ON p.user_id = u.id
+WHERE p.id = $1 LIMIT 1
+`
+
+type GetPostByIDRow struct {
+	ID             uuid.UUID   `json:"id"`
+	UserID         uuid.UUID   `json:"user_id"`
+	Title          string      `json:"title"`
+	Content        string      `json:"content"`
+	ViewCount      int64       `json:"view_count"`
+	CreatedAt      time.Time   `json:"created_at"`
+	UpdatedAt      time.Time   `json:"updated_at"`
+	AuthorID       uuid.UUID   `json:"author_id"`
+	AuthorUsername string      `json:"author_username"`
+	AuthorAvatar   pgtype.Text `json:"author_avatar"`
+}
+
+func (q *Queries) GetPostByID(ctx context.Context, id uuid.UUID) (GetPostByIDRow, error) {
+	row := q.db.QueryRow(ctx, getPostByID, id)
+	var i GetPostByIDRow
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Title,
+		&i.Content,
+		&i.ViewCount,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.AuthorID,
+		&i.AuthorUsername,
+		&i.AuthorAvatar,
+	)
+	return i, err
+}
+
+const getPostMediaByPostID = `-- name: GetPostMediaByPostID :many
+SELECT id, post_id, media_url, media_type, sort_order, created_at FROM post_media WHERE post_id = $1 ORDER BY sort_order
+`
+
+func (q *Queries) GetPostMediaByPostID(ctx context.Context, postID uuid.UUID) ([]PostMedium, error) {
+	rows, err := q.db.Query(ctx, getPostMediaByPostID, postID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []PostMedium{}
+	for rows.Next() {
+		var i PostMedium
+		if err := rows.Scan(
+			&i.ID,
+			&i.PostID,
+			&i.MediaUrl,
+			&i.MediaType,
+			&i.SortOrder,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getUserByID = `-- name: GetUserByID :one
 SELECT id, username, password_hash, avatar_url, bio, created_at, updated_at FROM users WHERE id = $1 LIMIT 1
 `
@@ -110,6 +195,91 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 		&i.UpdatedAt,
 	)
 	return i, err
+}
+
+const getUserByUsername = `-- name: GetUserByUsername :one
+SELECT id, username, password_hash, avatar_url, bio, created_at, updated_at FROM users WHERE username = $1 LIMIT 1
+`
+
+func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User, error) {
+	row := q.db.QueryRow(ctx, getUserByUsername, username)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.PasswordHash,
+		&i.AvatarUrl,
+		&i.Bio,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const incrementViewCount = `-- name: IncrementViewCount :exec
+UPDATE posts SET view_count = view_count + 1 WHERE id = $1
+`
+
+func (q *Queries) IncrementViewCount(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.Exec(ctx, incrementViewCount, id)
+	return err
+}
+
+const listPostsByUser = `-- name: ListPostsByUser :many
+SELECT
+    p.id, p.title, p.content, p.view_count, p.created_at,
+    u.id AS author_id, u.username AS author_username, u.avatar_url AS author_avatar
+FROM posts p
+JOIN users u ON p.user_id = u.id
+WHERE p.user_id = $1
+ORDER BY p.created_at DESC
+LIMIT $3 OFFSET $2
+`
+
+type ListPostsByUserParams struct {
+	UserID      uuid.UUID `json:"user_id"`
+	OffsetCount int32     `json:"offset_count"`
+	LimitCount  int32     `json:"limit_count"`
+}
+
+type ListPostsByUserRow struct {
+	ID             uuid.UUID   `json:"id"`
+	Title          string      `json:"title"`
+	Content        string      `json:"content"`
+	ViewCount      int64       `json:"view_count"`
+	CreatedAt      time.Time   `json:"created_at"`
+	AuthorID       uuid.UUID   `json:"author_id"`
+	AuthorUsername string      `json:"author_username"`
+	AuthorAvatar   pgtype.Text `json:"author_avatar"`
+}
+
+func (q *Queries) ListPostsByUser(ctx context.Context, arg ListPostsByUserParams) ([]ListPostsByUserRow, error) {
+	rows, err := q.db.Query(ctx, listPostsByUser, arg.UserID, arg.OffsetCount, arg.LimitCount)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListPostsByUserRow{}
+	for rows.Next() {
+		var i ListPostsByUserRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Content,
+			&i.ViewCount,
+			&i.CreatedAt,
+			&i.AuthorID,
+			&i.AuthorUsername,
+			&i.AuthorAvatar,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const listPostsFeed = `-- name: ListPostsFeed :many
@@ -192,4 +362,35 @@ func (q *Queries) ToggleLike(ctx context.Context, arg ToggleLikeParams) error {
 		arg.TargetType,
 	)
 	return err
+}
+
+const updateUser = `-- name: UpdateUser :one
+UPDATE users SET username = $1, avatar_url = $2, bio = $3, updated_at = NOW() WHERE id = $4 RETURNING id, username, password_hash, avatar_url, bio, created_at, updated_at
+`
+
+type UpdateUserParams struct {
+	Username  string      `json:"username"`
+	AvatarUrl pgtype.Text `json:"avatar_url"`
+	Bio       pgtype.Text `json:"bio"`
+	ID        uuid.UUID   `json:"id"`
+}
+
+func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error) {
+	row := q.db.QueryRow(ctx, updateUser,
+		arg.Username,
+		arg.AvatarUrl,
+		arg.Bio,
+		arg.ID,
+	)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.PasswordHash,
+		&i.AvatarUrl,
+		&i.Bio,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
 }
