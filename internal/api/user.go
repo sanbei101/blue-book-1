@@ -54,6 +54,13 @@ func toUserResponse(u *db.User) userResponse {
 	return resp
 }
 
+//	@Summary	用户注册
+//	@Tags		users
+//	@Param		body	body		registerRequest	true	"注册信息"
+//	@Success	200		{object}	render.Response[authResponse]
+//	@Failure	409		{object}	render.errorResponse
+//	@Failure	500		{object}	render.errorResponse
+//	@Router		/users/register [post]
 func (h *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 	body, err := render.ReadBody[registerRequest](w, r)
 	if err != nil {
@@ -94,6 +101,13 @@ type loginRequest struct {
 	Password string `json:"password" validate:"required"`
 }
 
+//	@Summary	用户登录
+//	@Tags		users
+//	@Param		body	body		loginRequest	true	"登录信息"
+//	@Success	200		{object}	render.Response[authResponse]
+//	@Failure	401		{object}	render.errorResponse
+//	@Failure	500		{object}	render.errorResponse
+//	@Router		/users/login [post]
 func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	body, err := render.ReadBody[loginRequest](w, r)
 	if err != nil {
@@ -127,6 +141,13 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 // ---- 获取用户资料 ----
 
+//	@Summary	获取用户资料
+//	@Tags		users
+//	@Param		id	path		string	true	"用户 ID"
+//	@Success	200	{object}	render.Response[userResponse]
+//	@Failure	400	{object}	render.errorResponse
+//	@Failure	404	{object}	render.errorResponse
+//	@Router		/users/{id} [get]
 func (h *UserHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := uuid.Parse(idStr)
@@ -152,6 +173,14 @@ type updateProfileRequest struct {
 	Bio       string `json:"bio"        validate:"max=200"`
 }
 
+//	@Summary	更新用户资料
+//	@Tags		users
+//	@Security	BearerAuth
+//	@Param		body	body		updateProfileRequest	true	"更新信息"
+//	@Success	200		{object}	render.Response[userResponse]
+//	@Failure	400		{object}	render.errorResponse
+//	@Failure	500		{object}	render.errorResponse
+//	@Router		/users/profile [put]
 func (h *UserHandler) UpdateProfile(w http.ResponseWriter, r *http.Request) {
 	currentUserID := jwt.GetUserIDFromContext(r)
 

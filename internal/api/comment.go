@@ -32,6 +32,14 @@ type createCommentResponse struct {
 	ID uuid.UUID `json:"id"`
 }
 
+//	@Summary	创建评论
+//	@Tags		comments
+//	@Security	BearerAuth
+//	@Param		body	body		createCommentRequest	true	"评论内容"
+//	@Success	200		{object}	render.Response[createCommentResponse]
+//	@Failure	400		{object}	render.errorResponse
+//	@Failure	500		{object}	render.errorResponse
+//	@Router		/comments [post]
 func (h *CommentHandler) Create(w http.ResponseWriter, r *http.Request) {
 	body, err := render.ReadBody[createCommentRequest](w, r)
 	if err != nil {
@@ -68,6 +76,15 @@ type commentResponse struct {
 	CreatedAt      time.Time  `json:"created_at"`
 }
 
+//	@Summary	获取帖子评论列表
+//	@Tags		comments
+//	@Param		post_id		query		string	true	"帖子 ID"
+//	@Param		page		query		int		false	"页码"	default(1)
+//	@Param		page_size	query		int		false	"每页数量"	default(20)
+//	@Success	200			{object}	render.Response[[]commentResponse]
+//	@Failure	400			{object}	render.errorResponse
+//	@Failure	500			{object}	render.errorResponse
+//	@Router		/posts/{id}/comments [get]
 func (h *CommentHandler) ListByPost(w http.ResponseWriter, r *http.Request) {
 	postIDStr := r.URL.Query().Get("post_id")
 	postID, err := uuid.Parse(postIDStr)

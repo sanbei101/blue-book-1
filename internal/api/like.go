@@ -28,6 +28,14 @@ type toggleLikeResponse struct {
 	OK bool `json:"ok"`
 }
 
+//	@Summary	切换点赞状态
+//	@Tags		likes
+//	@Security	BearerAuth
+//	@Param		body	body		toggleLikeRequest	true	"点赞信息"
+//	@Success	200		{object}	render.Response[toggleLikeResponse]
+//	@Failure	400		{object}	render.errorResponse
+//	@Failure	500		{object}	render.errorResponse
+//	@Router		/likes [post]
 func (h *LikeHandler) Toggle(w http.ResponseWriter, r *http.Request) {
 	body, err := render.ReadBody[toggleLikeRequest](w, r)
 	if err != nil {

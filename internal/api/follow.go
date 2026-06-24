@@ -26,6 +26,14 @@ type followResponse struct {
 	OK bool `json:"ok"`
 }
 
+//	@Summary	关注用户
+//	@Tags		follows
+//	@Security	BearerAuth
+//	@Param		id	path		string	true	"目标用户 ID"
+//	@Success	200	{object}	render.Response[followResponse]
+//	@Failure	400	{object}	render.errorResponse
+//	@Failure	500	{object}	render.errorResponse
+//	@Router		/users/{id}/follow [post]
 func (h *FollowHandler) Follow(w http.ResponseWriter, r *http.Request) {
 	followingIDStr := chi.URLParam(r, "id")
 	followingID, err := uuid.Parse(followingIDStr)
@@ -55,6 +63,14 @@ func (h *FollowHandler) Follow(w http.ResponseWriter, r *http.Request) {
 
 // ---- 取消关注 ----
 
+//	@Summary	取消关注
+//	@Tags		follows
+//	@Security	BearerAuth
+//	@Param		id	path		string	true	"目标用户 ID"
+//	@Success	200	{object}	render.Response[followResponse]
+//	@Failure	400	{object}	render.errorResponse
+//	@Failure	500	{object}	render.errorResponse
+//	@Router		/users/{id}/follow [delete]
 func (h *FollowHandler) Unfollow(w http.ResponseWriter, r *http.Request) {
 	followingIDStr := chi.URLParam(r, "id")
 	followingID, err := uuid.Parse(followingIDStr)
@@ -100,6 +116,15 @@ func toFollowUserResponse(u *db.ListFollowersRow) followUserResponse {
 	return resp
 }
 
+//	@Summary	获取粉丝列表
+//	@Tags		follows
+//	@Param		id			path		string	true	"用户 ID"
+//	@Param		page		query		int		false	"页码"	default(1)
+//	@Param		page_size	query		int		false	"每页数量"	default(20)
+//	@Success	200			{object}	render.Response[[]followUserResponse]
+//	@Failure	400			{object}	render.errorResponse
+//	@Failure	500			{object}	render.errorResponse
+//	@Router		/users/{id}/followers [get]
 func (h *FollowHandler) ListFollowers(w http.ResponseWriter, r *http.Request) {
 	userIDStr := chi.URLParam(r, "id")
 	userID, err := uuid.Parse(userIDStr)
@@ -131,6 +156,15 @@ func (h *FollowHandler) ListFollowers(w http.ResponseWriter, r *http.Request) {
 
 // ---- 关注列表 ----
 
+//	@Summary	获取关注列表
+//	@Tags		follows
+//	@Param		id			path		string	true	"用户 ID"
+//	@Param		page		query		int		false	"页码"	default(1)
+//	@Param		page_size	query		int		false	"每页数量"	default(20)
+//	@Success	200			{object}	render.Response[[]followUserResponse]
+//	@Failure	400			{object}	render.errorResponse
+//	@Failure	500			{object}	render.errorResponse
+//	@Router		/users/{id}/following [get]
 func (h *FollowHandler) ListFollowing(w http.ResponseWriter, r *http.Request) {
 	userIDStr := chi.URLParam(r, "id")
 	userID, err := uuid.Parse(userIDStr)
