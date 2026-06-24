@@ -20,7 +20,7 @@ func (s *Seeder) seedComments(ctx context.Context, users []db.User, posts []db.P
 			commenter := users[s.rng.Intn(len(users))]
 
 			comment, err := s.store.CreateComment(ctx, db.CreateCommentParams{
-				ID:      uuid.New(),
+				ID:      uuid.Must(uuid.NewV7()),
 				PostID:  post.ID,
 				UserID:  commenter.ID,
 				Content: commentSeeds[s.rng.Intn(len(commentSeeds))],
@@ -38,7 +38,7 @@ func (s *Seeder) seedComments(ctx context.Context, users []db.User, posts []db.P
 					replier := users[s.rng.Intn(len(users))]
 
 					reply, err := s.store.CreateComment(ctx, db.CreateCommentParams{
-						ID:       uuid.New(),
+						ID:       uuid.Must(uuid.NewV7()),
 						PostID:   post.ID,
 						UserID:   replier.ID,
 						ParentID: &comment.ID,

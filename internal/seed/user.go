@@ -16,7 +16,7 @@ func (s *Seeder) seedUsers(ctx context.Context) ([]db.User, error) {
 
 	for _, u := range userSeeds {
 		user, err := s.store.CreateUser(ctx, db.CreateUserParams{
-			ID:           uuid.New(),
+			ID:           uuid.Must(uuid.NewV7()),
 			Username:     u.Username,
 			PasswordHash: "123456",
 			AvatarURL:    pgtype.Text{String: avatarURL(u.Username), Valid: true},

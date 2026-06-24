@@ -69,7 +69,7 @@ func (h *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 
 	// TODO: 使用 bcrypt 哈希密码
 	user, err := h.store.CreateUser(r.Context(), db.CreateUserParams{
-		ID:           uuid.New(),
+		ID:           uuid.Must(uuid.NewV7()),
 		Username:     body.Username,
 		PasswordHash: body.Password,
 		AvatarURL:    pgtype.Text{},

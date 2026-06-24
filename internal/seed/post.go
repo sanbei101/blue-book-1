@@ -17,7 +17,7 @@ func (s *Seeder) seedPosts(ctx context.Context, users []db.User) ([]db.Post, err
 		author := users[s.rng.Intn(len(users))]
 
 		post, err := s.store.CreatePost(ctx, db.CreatePostParams{
-			ID:      uuid.New(),
+			ID:      uuid.Must(uuid.NewV7()),
 			UserID:  author.ID,
 			Title:   p.Title,
 			Content: p.Content,
@@ -31,7 +31,7 @@ func (s *Seeder) seedPosts(ctx context.Context, users []db.User) ([]db.Post, err
 		mediaParams := make([]db.CreatePostMediaParams, 0, mediaCount)
 		for j := range mediaCount {
 			mediaParams = append(mediaParams, db.CreatePostMediaParams{
-				ID:        uuid.New(),
+				ID:        uuid.Must(uuid.NewV7()),
 				PostID:    post.ID,
 				MediaURL:  mediaURL(s.rng.Intn(1000) + i*100 + j),
 				MediaType: db.MediaTypeEnumImage,

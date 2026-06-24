@@ -113,7 +113,7 @@ func (h *PostHandler) Create(w http.ResponseWriter, r *http.Request) {
 	var created db.Post
 	err = h.store.ExecTx(r.Context(), func(q *db.Queries) error {
 		post, err := q.CreatePost(r.Context(), db.CreatePostParams{
-			ID:      uuid.New(),
+			ID:      uuid.Must(uuid.NewV7()),
 			UserID:  currentUserID,
 			Title:   body.Title,
 			Content: body.Content,
@@ -132,7 +132,7 @@ func (h *PostHandler) Create(w http.ResponseWriter, r *http.Request) {
 				}
 
 				params[i] = db.CreatePostMediaParams{
-					ID:        uuid.New(),
+					ID:        uuid.Must(uuid.NewV7()),
 					PostID:    post.ID,
 					MediaURL:  m.MediaURL,
 					MediaType: mediaType,

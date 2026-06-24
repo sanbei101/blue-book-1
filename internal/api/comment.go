@@ -48,7 +48,7 @@ func (h *CommentHandler) Create(w http.ResponseWriter, r *http.Request) {
 	currentUserID := jwt.GetUserIDFromContext(r)
 
 	comment, err := h.store.CreateComment(r.Context(), db.CreateCommentParams{
-		ID:       uuid.New(),
+		ID:       uuid.Must(uuid.NewV7()),
 		PostID:   body.PostID,
 		UserID:   currentUserID,
 		ParentID: body.ParentID,

@@ -26,7 +26,7 @@ func (s *Seeder) seedLikes(ctx context.Context, users []db.User, posts []db.Post
 			seen[key] = true
 
 			err := s.store.ToggleLike(ctx, db.ToggleLikeParams{
-				ID:         uuid.New(),
+				ID:         uuid.Must(uuid.NewV7()),
 				UserID:     user.ID,
 				TargetID:   post.ID,
 				TargetType: 1, // 帖子
@@ -50,7 +50,7 @@ func (s *Seeder) seedLikes(ctx context.Context, users []db.User, posts []db.Post
 			seen[key] = true
 
 			err := s.store.ToggleLike(ctx, db.ToggleLikeParams{
-				ID:         uuid.New(),
+				ID:         uuid.Must(uuid.NewV7()),
 				UserID:     user.ID,
 				TargetID:   comment.ID,
 				TargetType: 2, // 评论

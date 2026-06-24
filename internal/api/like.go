@@ -44,7 +44,7 @@ func (h *LikeHandler) Toggle(w http.ResponseWriter, r *http.Request) {
 	currentUserID := jwt.GetUserIDFromContext(r)
 
 	err = h.store.ToggleLike(r.Context(), db.ToggleLikeParams{
-		ID:         uuid.New(),
+		ID:         uuid.Must(uuid.NewV7()),
 		UserID:     currentUserID,
 		TargetID:   body.TargetID,
 		TargetType: body.TargetType,
