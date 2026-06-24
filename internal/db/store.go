@@ -19,6 +19,10 @@ func NewStore(pool *pgxpool.Pool) *Store {
 	}
 }
 
+func (s *Store) Pool() *pgxpool.Pool {
+	return s.pool
+}
+
 func (s *Store) ExecTx(ctx context.Context, fn func(*Queries) error) error {
 	tx, err := s.pool.Begin(ctx)
 	if err != nil {

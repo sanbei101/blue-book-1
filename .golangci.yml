@@ -35,24 +35,24 @@ linters:
       - legacy
       - std-error-handling
 
-formatters:
-  enable:
-    - gci
-    - gofumpt
-    - golines
-  settings:
-    gci:
-      sections:
-        - Standard
-        - Default
-        - Prefix(github.com/sanbei101/blue-book)
-    gofumpt:
-      extra-rules: true
-      module-path: "github.com/sanbei101/blue-book"
+# formatters:
+#   enable:
+#     - gci
+#     - gofumpt
+#     - golines
+#   settings:
+#     gci:
+#       sections:
+#         - Standard
+#         - Default
+#         - Prefix(github.com/sanbei101/blue-book)
+#     gofumpt:
+#       extra-rules: true
+#       module-path: "github.com/sanbei101/blue-book"
 
-    golines:
-      max-len: 120
-      shorten-comments: true
-  exclusions:
-    paths:
-      - "internal/db"
+#     golines:
+#       max-len: 120
+#       shorten-comments: true
+#   exclusions:
+#     paths:
+#       - "internal/db"
