@@ -37,3 +37,11 @@
 - 尽可能不要忽略err,调用数据库操作禁止忽略err!
 - 代码需要尽可能简洁,多复用写好的函数,不要重复造轮子
 - 每次跑完需要调用`golangci-lint run --fix`检查代码规范,确保没有报错
+
+## Swagger 注释规范
+- `@accept` 和 `@produce` 只在 `routes.go` 全局定义,其他文件禁止重复写
+- `@Success` 必须使用泛型包裹: `render.Response[T]`,不能直接写裸类型
+  - 单个对象: `@Success 200 {object} render.Response[listPostsResponse]`
+  - 数组: `@Success 200 {object} render.Response[[]listPostsResponse]`
+  - 无数据: `@Success 204 {object} render.ResponseWithoutData`
+- 注释格式使用 tab 对齐,保持一致性
