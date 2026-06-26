@@ -55,7 +55,7 @@ type createPostResponse struct {
 	ID uuid.UUID `json:"id"`
 }
 
-type listPostsResponse struct {
+type getPostsResponse struct {
 	ID        uuid.UUID       `json:"id"`
 	Title     string          `json:"title"`
 	Content   string          `json:"content"`
@@ -63,6 +63,16 @@ type listPostsResponse struct {
 	Author    authorResponse  `json:"author"`
 	Media     []mediaResponse `json:"media,omitempty"`
 	CreatedAt time.Time       `json:"created_at"`
+}
+
+type listPostsItemResponse struct {
+	ID        uuid.UUID      `json:"id"`
+	Title     string         `json:"title"`
+	Content   string         `json:"content"`
+	ViewCount int64          `json:"view_count"`
+	Author    authorResponse `json:"author"`
+	CoverURL  string         `json:"cover_url,omitempty"`
+	CreatedAt time.Time      `json:"created_at"`
 }
 
 type authorResponse struct {
@@ -158,7 +168,7 @@ func (h *PostHandler) Create(w http.ResponseWriter, r *http.Request) {
 //	@Tags		posts
 //	@Param		page		query		int	false	"页码"	default(1)
 //	@Param		page_size	query		int	false	"每页数量"	default(20)
-//	@Success	200			{object}	render.Response[[]listPostsResponse]
+//	@Success	200			{object}	render.Response[[]listPostsItemResponse]
 //	@Failure	500			{object}	render.errorResponse
 //	@Router		/posts [get]
 func (h *PostHandler) ListFeed(w http.ResponseWriter, r *http.Request) {
@@ -172,14 +182,15 @@ func (h *PostHandler) ListFeed(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	posts := make([]listPostsResponse, 0, len(rows))
+	posts := make([]listPostsItemResponse, 0, len(rows))
 	for i := range rows {
-		posts = append(posts, listPostsResponse{
+		posts = append(posts, listPostsItemResponse{
 			ID:        rows[i].ID,
 			Title:     rows[i].Title,
 			Content:   rows[i].Content,
 			ViewCount: rows[i].ViewCount,
 			CreatedAt: rows[i].CreatedAt,
+			CoverURL:  rows[i].CoverURL,
 			Author:    toAuthorFromFeed(rows[i].AuthorID, rows[i].AuthorUsername, rows[i].AuthorAvatar),
 		})
 	}
@@ -190,7 +201,7 @@ func (h *PostHandler) ListFeed(w http.ResponseWriter, r *http.Request) {
 //	@Summary	获取帖子详情
 //	@Tags		posts
 //	@Param		id	path		string	true	"帖子 ID"
-//	@Success	200	{object}	render.Response[listPostsResponse]
+//	@Success	200	{object}	render.Response[getPostsResponse]
 //	@Failure	400	{object}	render.errorResponse
 //	@Failure	404	{object}	render.errorResponse
 //	@Router		/posts/{id} [get]
@@ -224,7 +235,7 @@ func (h *PostHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 		mediaList = append(mediaList, toMediaResponse(&media[i]))
 	}
 
-	render.Success(w, "查询成功", listPostsResponse{
+	render.Success(w, "查询成功", getPostsResponse{
 		ID:        row.ID,
 		Title:     row.Title,
 		Content:   row.Content,
@@ -240,7 +251,7 @@ func (h *PostHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 //	@Security	BearerAuth
 //	@Param		page		query		int	false	"页码"	default(1)
 //	@Param		page_size	query		int	false	"每页数量"	default(20)
-//	@Success	200			{object}	render.Response[[]listPostsResponse]
+//	@Success	200			{object}	render.Response[[]listPostsItemResponse]
 //	@Failure	500			{object}	render.errorResponse
 //	@Router		/posts/user/{userID} [get]
 func (h *PostHandler) ListByUser(w http.ResponseWriter, r *http.Request) {
@@ -256,14 +267,15 @@ func (h *PostHandler) ListByUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	posts := make([]listPostsResponse, 0, len(rows))
+	posts := make([]listPostsItemResponse, 0, len(rows))
 	for i := range rows {
-		posts = append(posts, listPostsResponse{
+		posts = append(posts, listPostsItemResponse{
 			ID:        rows[i].ID,
 			Title:     rows[i].Title,
 			Content:   rows[i].Content,
 			ViewCount: rows[i].ViewCount,
 			CreatedAt: rows[i].CreatedAt,
+			CoverURL:  rows[i].CoverURL,
 			Author:    toAuthorFromFeed(rows[i].AuthorID, rows[i].AuthorUsername, rows[i].AuthorAvatar),
 		})
 	}

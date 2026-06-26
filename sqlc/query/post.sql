@@ -15,11 +15,23 @@ INSERT INTO post_media (
 -- name: ListPostsFeed :many
 SELECT
     p.id, p.title, p.content, p.view_count, p.created_at,
-    u.id AS author_id, u.username AS author_username, u.avatar_url AS author_avatar
-FROM posts p
+    u.id AS author_id, u.username AS author_username, u.avatar_url AS author_avatar,
+    COALESCE(pm.media_url, '') AS cover_url
+FROM (
+    SELECT id, user_id, title, content, view_count, created_at
+    FROM posts
+    ORDER BY id DESC
+    LIMIT @limit_count OFFSET @offset_count
+) p
 JOIN users u ON p.user_id = u.id
-ORDER BY p.created_at DESC
-LIMIT @limit_count OFFSET @offset_count;
+LEFT JOIN LATERAL (
+    SELECT media_url
+    FROM post_media
+    WHERE post_id = p.id
+    ORDER BY sort_order ASC
+    LIMIT 1
+) pm ON true
+ORDER BY p.id DESC;
 
 -- name: GetPostByID :one
 SELECT
@@ -32,9 +44,17 @@ WHERE p.id = @id LIMIT 1;
 -- name: ListPostsByUser :many
 SELECT
     p.id, p.title, p.content, p.view_count, p.created_at,
-    u.id AS author_id, u.username AS author_username, u.avatar_url AS author_avatar
+    u.id AS author_id, u.username AS author_username, u.avatar_url AS author_avatar,
+    COALESCE(pm.media_url, '') AS cover_url
 FROM posts p
 JOIN users u ON p.user_id = u.id
+LEFT JOIN LATERAL (
+    SELECT media_url
+    FROM post_media
+    WHERE post_id = p.id
+    ORDER BY sort_order ASC
+    LIMIT 1
+) pm ON true
 WHERE p.user_id = @user_id
 ORDER BY p.created_at DESC
 LIMIT @limit_count OFFSET @offset_count;

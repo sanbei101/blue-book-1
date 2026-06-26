@@ -162,9 +162,17 @@ func (q *Queries) IncrementViewCount(ctx context.Context, id uuid.UUID) error {
 const listPostsByUser = `-- name: ListPostsByUser :many
 SELECT
     p.id, p.title, p.content, p.view_count, p.created_at,
-    u.id AS author_id, u.username AS author_username, u.avatar_url AS author_avatar
+    u.id AS author_id, u.username AS author_username, u.avatar_url AS author_avatar,
+    COALESCE(pm.media_url, '') AS cover_url
 FROM posts p
 JOIN users u ON p.user_id = u.id
+LEFT JOIN LATERAL (
+    SELECT media_url
+    FROM post_media
+    WHERE post_id = p.id
+    ORDER BY sort_order ASC
+    LIMIT 1
+) pm ON true
 WHERE p.user_id = $1
 ORDER BY p.created_at DESC
 LIMIT $3 OFFSET $2
@@ -185,6 +193,7 @@ type ListPostsByUserRow struct {
 	AuthorID       uuid.UUID   `json:"author_id"`
 	AuthorUsername string      `json:"author_username"`
 	AuthorAvatar   pgtype.Text `json:"author_avatar"`
+	CoverURL       string      `json:"cover_url"`
 }
 
 func (q *Queries) ListPostsByUser(ctx context.Context, arg ListPostsByUserParams) ([]ListPostsByUserRow, error) {
@@ -205,6 +214,7 @@ func (q *Queries) ListPostsByUser(ctx context.Context, arg ListPostsByUserParams
 			&i.AuthorID,
 			&i.AuthorUsername,
 			&i.AuthorAvatar,
+			&i.CoverURL,
 		); err != nil {
 			return nil, err
 		}
@@ -219,11 +229,23 @@ func (q *Queries) ListPostsByUser(ctx context.Context, arg ListPostsByUserParams
 const listPostsFeed = `-- name: ListPostsFeed :many
 SELECT
     p.id, p.title, p.content, p.view_count, p.created_at,
-    u.id AS author_id, u.username AS author_username, u.avatar_url AS author_avatar
-FROM posts p
+    u.id AS author_id, u.username AS author_username, u.avatar_url AS author_avatar,
+    COALESCE(pm.media_url, '') AS cover_url
+FROM (
+    SELECT id, user_id, title, content, view_count, created_at
+    FROM posts
+    ORDER BY id DESC
+    LIMIT $2 OFFSET $1
+) p
 JOIN users u ON p.user_id = u.id
-ORDER BY p.created_at DESC
-LIMIT $2 OFFSET $1
+LEFT JOIN LATERAL (
+    SELECT media_url
+    FROM post_media
+    WHERE post_id = p.id
+    ORDER BY sort_order ASC
+    LIMIT 1
+) pm ON true
+ORDER BY p.id DESC
 `
 
 type ListPostsFeedParams struct {
@@ -240,6 +262,7 @@ type ListPostsFeedRow struct {
 	AuthorID       uuid.UUID   `json:"author_id"`
 	AuthorUsername string      `json:"author_username"`
 	AuthorAvatar   pgtype.Text `json:"author_avatar"`
+	CoverURL       string      `json:"cover_url"`
 }
 
 func (q *Queries) ListPostsFeed(ctx context.Context, arg ListPostsFeedParams) ([]ListPostsFeedRow, error) {
@@ -260,6 +283,7 @@ func (q *Queries) ListPostsFeed(ctx context.Context, arg ListPostsFeedParams) ([
 			&i.AuthorID,
 			&i.AuthorUsername,
 			&i.AuthorAvatar,
+			&i.CoverURL,
 		); err != nil {
 			return nil, err
 		}

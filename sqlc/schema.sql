@@ -19,7 +19,6 @@ CREATE TABLE posts (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 CREATE INDEX idx_posts_user_id ON posts(user_id);
-CREATE INDEX idx_posts_created_at ON posts(created_at DESC);
 
 CREATE TYPE media_type_enum AS ENUM ('image', 'video');
 
@@ -31,7 +30,7 @@ CREATE TABLE post_media (
     sort_order SMALLINT NOT NULL DEFAULT 0,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
-CREATE INDEX idx_post_media_post_id ON post_media(post_id);
+CREATE INDEX idx_post_media_post_id ON post_media(post_id, sort_order ASC);
 
 CREATE TABLE comments (
     id UUID PRIMARY KEY DEFAULT uuidv7(),

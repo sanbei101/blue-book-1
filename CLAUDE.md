@@ -45,3 +45,8 @@
   - 数组: `@Success 200 {object} render.Response[[]listPostsResponse]`
   - 无数据: `@Success 204 {object} render.ResponseWithoutData`
 - 注释格式使用 tab 对齐,保持一致性
+- 每次修改完成代码需要使用以下命令进行`swagger`生成:
+```
+swag init -g routes.go -d internal/api,internal/pkg/render --ot yaml
+swag fmt -g routes.go -d internal/api
+```
