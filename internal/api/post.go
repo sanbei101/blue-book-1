@@ -248,14 +248,20 @@ func (h *PostHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 
 //	@Summary	获取指定用户的帖子列表
 //	@Tags		posts
-//	@Security	BearerAuth
-//	@Param		page		query		int	false	"页码"	default(1)
-//	@Param		page_size	query		int	false	"每页数量"	default(20)
+//	@Param		userID		path		string	true	"用户 ID"
+//	@Param		page		query		int		false	"页码"	default(1)
+//	@Param		page_size	query		int		false	"每页数量"	default(20)
 //	@Success	200			{object}	render.Response[[]listPostsItemResponse]
+//	@Failure	400			{object}	render.errorResponse
 //	@Failure	500			{object}	render.errorResponse
 //	@Router		/posts/user/{userID} [get]
 func (h *PostHandler) ListByUser(w http.ResponseWriter, r *http.Request) {
-	userID := jwt.GetUserIDFromContext(r)
+	userIDStr := chi.URLParam(r, "userID")
+	userID, err := uuid.Parse(userIDStr)
+	if err != nil {
+		render.Error(w, http.StatusBadRequest, "无效的用户 ID")
+		return
+	}
 	offset, pageSize := Pagination(r, 1, 20, 50)
 	rows, err := h.store.ListPostsByUser(r.Context(), db.ListPostsByUserParams{
 		UserID:      userID,

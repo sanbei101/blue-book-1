@@ -529,6 +529,11 @@ paths:
   /posts/user/{userID}:
     get:
       parameters:
+      - description: 用户 ID
+        in: path
+        name: userID
+        required: true
+        type: string
       - default: 1
         description: 页码
         in: query
@@ -544,12 +549,14 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/render.Response-array_api_listPostsItemResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/render.errorResponse'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/render.errorResponse'
-      security:
-      - BearerAuth: []
       summary: 获取指定用户的帖子列表
       tags:
       - posts
