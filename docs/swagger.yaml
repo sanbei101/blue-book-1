@@ -3,48 +3,65 @@ components:
     api.authResponse:
       properties:
         token:
+          description: JWT token
           type: string
         user:
           $ref: '#/components/schemas/api.userResponse'
       type: object
     api.authorResponse:
+      description: 作者信息
       properties:
         avatar_url:
+          description: 头像地址
           type: string
         id:
+          description: 用户 ID
           type: string
         username:
+          description: 用户名
           type: string
       type: object
     api.commentResponse:
       properties:
         author_avatar:
+          description: 作者头像地址
           type: string
         author_username:
+          description: 作者用户名
           type: string
         content:
+          description: 评论内容
           type: string
         created_at:
+          description: 创建时间
           type: string
         id:
+          description: 评论 ID
           type: string
         like_count:
+          description: 点赞数
           type: integer
         parent_id:
+          description: 父评论 ID,顶级评论为 nil
           type: string
         post_id:
+          description: 帖子 ID
           type: string
         user_id:
+          description: 用户 ID
           type: string
       type: object
     api.createCommentRequest:
       properties:
         content:
+          description: 评论内容
           maxLength: 1000
           type: string
         parent_id:
+          description: 父评论 ID,如果是顶级评论则为 nil
           type: string
         post_id:
+          description: 帖子唯一标识 ID
           type: string
       required:
       - content
@@ -53,18 +70,22 @@ components:
     api.createCommentResponse:
       properties:
         id:
+          description: 评论 ID
           type: string
       type: object
     api.createMediaItem:
       properties:
         media_type:
+          description: 媒体类型 (image/video)
           enum:
           - image
           - video
           type: string
         media_url:
+          description: 媒体 URL
           type: string
         sort_order:
+          description: 排序序号
           type: integer
       required:
       - media_type
@@ -73,13 +94,16 @@ components:
     api.createPostRequest:
       properties:
         content:
+          description: 帖子内容
           type: string
         media:
+          description: 媒体列表
           items:
             $ref: '#/components/schemas/api.createMediaItem'
           type: array
           uniqueItems: false
         title:
+          description: 帖子标题
           maxLength: 200
           type: string
       required:
@@ -89,22 +113,28 @@ components:
     api.createPostResponse:
       properties:
         id:
+          description: 帖子 ID
           type: string
       type: object
     api.followResponse:
       properties:
         ok:
+          description: 操作是否成功
           type: boolean
       type: object
     api.followUserResponse:
       properties:
         avatar_url:
+          description: 头像地址
           type: string
         bio:
+          description: 个人简介
           type: string
         id:
+          description: 用户 ID
           type: string
         username:
+          description: 用户名
           type: string
       type: object
     api.getPostsResponse:
@@ -112,19 +142,25 @@ components:
         author:
           $ref: '#/components/schemas/api.authorResponse'
         content:
+          description: 内容
           type: string
         created_at:
+          description: 创建时间
           type: string
         id:
+          description: 帖子 ID
           type: string
         media:
+          description: 媒体列表
           items:
             $ref: '#/components/schemas/api.mediaResponse'
           type: array
           uniqueItems: false
         title:
+          description: 标题
           type: string
         view_count:
+          description: 浏览量
           type: integer
       type: object
     api.listPostsItemResponse:
@@ -132,23 +168,31 @@ components:
         author:
           $ref: '#/components/schemas/api.authorResponse'
         content:
+          description: 内容
           type: string
         cover_url:
+          description: 封面 URL
           type: string
         created_at:
+          description: 创建时间
           type: string
         id:
+          description: 帖子 ID
           type: string
         title:
+          description: 标题
           type: string
         view_count:
+          description: 浏览量
           type: integer
       type: object
     api.loginRequest:
       properties:
         password:
+          description: 密码
           type: string
         username:
+          description: 用户名
           type: string
       required:
       - password
@@ -157,21 +201,27 @@ components:
     api.mediaResponse:
       properties:
         id:
+          description: 媒体 ID
           type: string
         media_type:
+          description: 媒体类型
           type: string
         media_url:
+          description: 媒体 URL
           type: string
         sort_order:
+          description: 排序序号
           type: integer
       type: object
     api.registerRequest:
       properties:
         password:
+          description: 密码
           maxLength: 128
           minLength: 6
           type: string
         username:
+          description: 用户名
           maxLength: 32
           minLength: 3
           type: string
@@ -182,8 +232,10 @@ components:
     api.toggleLikeRequest:
       properties:
         target_id:
+          description: 目标 ID (帖子 ID 或 评论 ID)
           type: string
         target_type:
+          description: 目标类型 (1=帖子, 2=评论)
           enum:
           - 1
           - 2
@@ -195,16 +247,20 @@ components:
     api.toggleLikeResponse:
       properties:
         ok:
+          description: 是否点赞成功
           type: boolean
       type: object
     api.updateProfileRequest:
       properties:
         avatar_url:
+          description: 头像 URL
           type: string
         bio:
+          description: 个人简介
           maxLength: 200
           type: string
         username:
+          description: 用户名
           maxLength: 32
           minLength: 3
           type: string
@@ -212,14 +268,19 @@ components:
       - username
       type: object
     api.userResponse:
+      description: 用户信息
       properties:
         avatar_url:
+          description: 头像地址
           type: string
         bio:
+          description: 个人简介
           type: string
         id:
+          description: 用户 ID
           type: string
         username:
+          description: 用户名
           type: string
       type: object
     render.Response-api_authResponse:

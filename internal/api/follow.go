@@ -23,6 +23,7 @@ func NewFollowHandler(store *db.Store) *FollowHandler {
 // ---- 关注 ----
 
 type followResponse struct {
+	// 操作是否成功
 	OK bool `json:"ok"`
 }
 
@@ -100,9 +101,13 @@ func (h *FollowHandler) Unfollow(w http.ResponseWriter, r *http.Request) {
 // ---- 粉丝列表 ----
 
 type followUserResponse struct {
+	// 用户 ID
 	ID        uuid.UUID `json:"id"`
+	// 用户名
 	Username  string    `json:"username"`
+	// 头像地址
 	AvatarURL string    `json:"avatar_url,omitempty"`
+	// 个人简介
 	Bio       string    `json:"bio,omitempty"`
 }
 

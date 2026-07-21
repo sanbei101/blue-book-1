@@ -23,12 +23,16 @@ func NewCommentHandler(store *db.Store) *CommentHandler {
 // ---- 创建评论 ----
 
 type createCommentRequest struct {
-	PostID   uuid.UUID  `json:"post_id"   validate:"required"`
+	// 帖子唯一标识 ID
+	PostID uuid.UUID `json:"post_id" validate:"required"`
+	// 父评论 ID,如果是顶级评论则为 nil
 	ParentID *uuid.UUID `json:"parent_id"`
-	Content  string     `json:"content"   validate:"required,max=1000"`
+	// 评论内容
+	Content string `json:"content" validate:"required,max=1000"`
 }
 
 type createCommentResponse struct {
+	// 评论 ID
 	ID uuid.UUID `json:"id"`
 }
 
@@ -67,14 +71,23 @@ func (h *CommentHandler) Create(w http.ResponseWriter, r *http.Request) {
 
 // ---- 帖子评论列表 ----
 type commentResponse struct {
-	ID             uuid.UUID  `json:"id"`
-	PostID         uuid.UUID  `json:"post_id"`
-	UserID         uuid.UUID  `json:"user_id"`
+	// 评论 ID
+	ID uuid.UUID `json:"id"`
+	// 帖子 ID
+	PostID uuid.UUID `json:"post_id"`
+	// 用户 ID
+	UserID uuid.UUID `json:"user_id"`
+	// 父评论 ID,顶级评论为 nil
 	ParentID       *uuid.UUID `json:"parent_id,omitempty"`
+	// 评论内容
 	Content        string     `json:"content"`
+	// 点赞数
 	LikeCount      int32      `json:"like_count"`
+	// 作者用户名
 	AuthorUsername string     `json:"author_username"`
+	// 作者头像地址
 	AuthorAvatar   string     `json:"author_avatar,omitempty"`
+	// 创建时间
 	CreatedAt      time.Time  `json:"created_at"`
 }
 

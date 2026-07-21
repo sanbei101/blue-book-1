@@ -24,19 +24,27 @@ func NewUserHandler(store *db.Store) *UserHandler {
 // ---- 注册 ----
 
 type registerRequest struct {
+	// 用户名
 	Username string `json:"username" validate:"required,min=3,max=32"`
+	// 密码
 	Password string `json:"password" validate:"required,min=6,max=128"`
 }
 
 type authResponse struct {
+	// JWT token
 	Token string       `json:"token"`
+	// 用户信息
 	User  userResponse `json:"user"`
 }
 
 type userResponse struct {
+	// 用户 ID
 	ID        uuid.UUID `json:"id"`
+	// 用户名
 	Username  string    `json:"username"`
+	// 头像地址
 	AvatarURL string    `json:"avatar_url,omitempty"`
+	// 个人简介
 	Bio       string    `json:"bio,omitempty"`
 }
 
@@ -99,7 +107,9 @@ func (h *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 // ---- 登录 ----
 
 type loginRequest struct {
+	// 用户名
 	Username string `json:"username" validate:"required"`
+	// 密码
 	Password string `json:"password" validate:"required"`
 }
 
@@ -172,8 +182,11 @@ func (h *UserHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
 // ---- 更新资料 ----
 
 type updateProfileRequest struct {
+	// 用户名
 	Username  string `json:"username"   validate:"required,min=3,max=32"`
+	// 头像 URL
 	AvatarURL string `json:"avatar_url"`
+	// 个人简介
 	Bio       string `json:"bio"        validate:"max=200"`
 }
 

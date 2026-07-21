@@ -41,50 +41,78 @@ func NewPostHandler(store *db.Store) *PostHandler {
 }
 
 type createPostRequest struct {
+	// 帖子标题
 	Title   string            `json:"title"   validate:"required,max=200"`
+	// 帖子内容
 	Content string            `json:"content" validate:"required"`
+	// 媒体列表
 	Media   []createMediaItem `json:"media"`
 }
 type createMediaItem struct {
+	// 媒体 URL
 	MediaURL  string `json:"media_url"  validate:"required,url"`
+	// 媒体类型 (image/video)
 	MediaType string `json:"media_type" validate:"required,oneof=image video"`
+	// 排序序号
 	SortOrder int16  `json:"sort_order"`
 }
 
 type createPostResponse struct {
+	// 帖子 ID
 	ID uuid.UUID `json:"id"`
 }
 
 type getPostsResponse struct {
+	// 帖子 ID
 	ID        uuid.UUID       `json:"id"`
+	// 标题
 	Title     string          `json:"title"`
+	// 内容
 	Content   string          `json:"content"`
+	// 浏览量
 	ViewCount int64           `json:"view_count"`
+	// 作者信息
 	Author    authorResponse  `json:"author"`
+	// 媒体列表
 	Media     []mediaResponse `json:"media,omitempty"`
+	// 创建时间
 	CreatedAt time.Time       `json:"created_at"`
 }
 
 type listPostsItemResponse struct {
+	// 帖子 ID
 	ID        uuid.UUID      `json:"id"`
+	// 标题
 	Title     string         `json:"title"`
+	// 内容
 	Content   string         `json:"content"`
+	// 浏览量
 	ViewCount int64          `json:"view_count"`
+	// 作者信息
 	Author    authorResponse `json:"author"`
+	// 封面 URL
 	CoverURL  string         `json:"cover_url,omitempty"`
+	// 创建时间
 	CreatedAt time.Time      `json:"created_at"`
 }
 
 type authorResponse struct {
+	// 用户 ID
 	ID        uuid.UUID `json:"id"`
+	// 用户名
 	Username  string    `json:"username"`
+	// 头像地址
 	AvatarURL string    `json:"avatar_url,omitempty"`
 }
 
 type mediaResponse struct {
+	// 媒体 ID
 	ID        uuid.UUID `json:"id"`
+	// 媒体 URL
 	MediaURL  string    `json:"media_url"`
+	// 媒体类型
 	MediaType string    `json:"media_type"`
+	// 排序序号
 	SortOrder int16     `json:"sort_order"`
 }
 
