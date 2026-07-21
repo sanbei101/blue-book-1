@@ -1,365 +1,383 @@
-basePath: /api/v1
-consumes:
-- application/json
-definitions:
-  api.authResponse:
-    properties:
-      token:
-        type: string
-      user:
-        $ref: '#/definitions/api.userResponse'
-    type: object
-  api.authorResponse:
-    properties:
-      avatar_url:
-        type: string
-      id:
-        type: string
-      username:
-        type: string
-    type: object
-  api.commentResponse:
-    properties:
-      author_avatar:
-        type: string
-      author_username:
-        type: string
-      content:
-        type: string
-      created_at:
-        type: string
-      id:
-        type: string
-      like_count:
-        type: integer
-      parent_id:
-        type: string
-      post_id:
-        type: string
-      user_id:
-        type: string
-    type: object
-  api.createCommentRequest:
-    properties:
-      content:
-        maxLength: 1000
-        type: string
-      parent_id:
-        type: string
-      post_id:
-        type: string
-    required:
-    - content
-    - post_id
-    type: object
-  api.createCommentResponse:
-    properties:
-      id:
-        type: string
-    type: object
-  api.createMediaItem:
-    properties:
-      media_type:
-        enum:
-        - image
-        - video
-        type: string
-      media_url:
-        type: string
-      sort_order:
-        type: integer
-    required:
-    - media_type
-    - media_url
-    type: object
-  api.createPostRequest:
-    properties:
-      content:
-        type: string
-      media:
-        items:
-          $ref: '#/definitions/api.createMediaItem'
-        type: array
-      title:
-        maxLength: 200
-        type: string
-    required:
-    - content
-    - title
-    type: object
-  api.createPostResponse:
-    properties:
-      id:
-        type: string
-    type: object
-  api.followResponse:
-    properties:
-      ok:
-        type: boolean
-    type: object
-  api.followUserResponse:
-    properties:
-      avatar_url:
-        type: string
-      bio:
-        type: string
-      id:
-        type: string
-      username:
-        type: string
-    type: object
-  api.getPostsResponse:
-    properties:
-      author:
-        $ref: '#/definitions/api.authorResponse'
-      content:
-        type: string
-      created_at:
-        type: string
-      id:
-        type: string
-      media:
-        items:
-          $ref: '#/definitions/api.mediaResponse'
-        type: array
-      title:
-        type: string
-      view_count:
-        type: integer
-    type: object
-  api.listPostsItemResponse:
-    properties:
-      author:
-        $ref: '#/definitions/api.authorResponse'
-      content:
-        type: string
-      cover_url:
-        type: string
-      created_at:
-        type: string
-      id:
-        type: string
-      title:
-        type: string
-      view_count:
-        type: integer
-    type: object
-  api.loginRequest:
-    properties:
-      password:
-        type: string
-      username:
-        type: string
-    required:
-    - password
-    - username
-    type: object
-  api.mediaResponse:
-    properties:
-      id:
-        type: string
-      media_type:
-        type: string
-      media_url:
-        type: string
-      sort_order:
-        type: integer
-    type: object
-  api.registerRequest:
-    properties:
-      password:
-        maxLength: 128
-        minLength: 6
-        type: string
-      username:
-        maxLength: 32
-        minLength: 3
-        type: string
-    required:
-    - password
-    - username
-    type: object
-  api.toggleLikeRequest:
-    properties:
-      target_id:
-        type: string
-      target_type:
-        enum:
-        - 1
-        - 2
-        type: integer
-    required:
-    - target_id
-    - target_type
-    type: object
-  api.toggleLikeResponse:
-    properties:
-      ok:
-        type: boolean
-    type: object
-  api.updateProfileRequest:
-    properties:
-      avatar_url:
-        type: string
-      bio:
-        maxLength: 200
-        type: string
-      username:
-        maxLength: 32
-        minLength: 3
-        type: string
-    required:
-    - username
-    type: object
-  api.userResponse:
-    properties:
-      avatar_url:
-        type: string
-      bio:
-        type: string
-      id:
-        type: string
-      username:
-        type: string
-    type: object
-  render.Response-api_authResponse:
-    properties:
-      code:
-        type: integer
-      data:
-        $ref: '#/definitions/api.authResponse'
-      msg:
-        type: string
-    type: object
-  render.Response-api_createCommentResponse:
-    properties:
-      code:
-        type: integer
-      data:
-        $ref: '#/definitions/api.createCommentResponse'
-      msg:
-        type: string
-    type: object
-  render.Response-api_createPostResponse:
-    properties:
-      code:
-        type: integer
-      data:
-        $ref: '#/definitions/api.createPostResponse'
-      msg:
-        type: string
-    type: object
-  render.Response-api_followResponse:
-    properties:
-      code:
-        type: integer
-      data:
-        $ref: '#/definitions/api.followResponse'
-      msg:
-        type: string
-    type: object
-  render.Response-api_getPostsResponse:
-    properties:
-      code:
-        type: integer
-      data:
-        $ref: '#/definitions/api.getPostsResponse'
-      msg:
-        type: string
-    type: object
-  render.Response-api_toggleLikeResponse:
-    properties:
-      code:
-        type: integer
-      data:
-        $ref: '#/definitions/api.toggleLikeResponse'
-      msg:
-        type: string
-    type: object
-  render.Response-api_userResponse:
-    properties:
-      code:
-        type: integer
-      data:
-        $ref: '#/definitions/api.userResponse'
-      msg:
-        type: string
-    type: object
-  render.Response-array_api_commentResponse:
-    properties:
-      code:
-        type: integer
-      data:
-        items:
-          $ref: '#/definitions/api.commentResponse'
-        type: array
-      msg:
-        type: string
-    type: object
-  render.Response-array_api_followUserResponse:
-    properties:
-      code:
-        type: integer
-      data:
-        items:
-          $ref: '#/definitions/api.followUserResponse'
-        type: array
-      msg:
-        type: string
-    type: object
-  render.Response-array_api_listPostsItemResponse:
-    properties:
-      code:
-        type: integer
-      data:
-        items:
-          $ref: '#/definitions/api.listPostsItemResponse'
-        type: array
-      msg:
-        type: string
-    type: object
-  render.ResponseWithoutData:
-    properties:
-      code:
-        type: integer
-      msg:
-        type: string
-    type: object
-  render.errorResponse:
-    properties:
-      code:
-        type: integer
-      msg:
-        type: string
-    type: object
+components:
+  schemas:
+    api.authResponse:
+      properties:
+        token:
+          type: string
+        user:
+          $ref: '#/components/schemas/api.userResponse'
+      type: object
+    api.authorResponse:
+      properties:
+        avatar_url:
+          type: string
+        id:
+          type: string
+        username:
+          type: string
+      type: object
+    api.commentResponse:
+      properties:
+        author_avatar:
+          type: string
+        author_username:
+          type: string
+        content:
+          type: string
+        created_at:
+          type: string
+        id:
+          type: string
+        like_count:
+          type: integer
+        parent_id:
+          type: string
+        post_id:
+          type: string
+        user_id:
+          type: string
+      type: object
+    api.createCommentRequest:
+      properties:
+        content:
+          maxLength: 1000
+          type: string
+        parent_id:
+          type: string
+        post_id:
+          type: string
+      required:
+      - content
+      - post_id
+      type: object
+    api.createCommentResponse:
+      properties:
+        id:
+          type: string
+      type: object
+    api.createMediaItem:
+      properties:
+        media_type:
+          enum:
+          - image
+          - video
+          type: string
+        media_url:
+          type: string
+        sort_order:
+          type: integer
+      required:
+      - media_type
+      - media_url
+      type: object
+    api.createPostRequest:
+      properties:
+        content:
+          type: string
+        media:
+          items:
+            $ref: '#/components/schemas/api.createMediaItem'
+          type: array
+          uniqueItems: false
+        title:
+          maxLength: 200
+          type: string
+      required:
+      - content
+      - title
+      type: object
+    api.createPostResponse:
+      properties:
+        id:
+          type: string
+      type: object
+    api.followResponse:
+      properties:
+        ok:
+          type: boolean
+      type: object
+    api.followUserResponse:
+      properties:
+        avatar_url:
+          type: string
+        bio:
+          type: string
+        id:
+          type: string
+        username:
+          type: string
+      type: object
+    api.getPostsResponse:
+      properties:
+        author:
+          $ref: '#/components/schemas/api.authorResponse'
+        content:
+          type: string
+        created_at:
+          type: string
+        id:
+          type: string
+        media:
+          items:
+            $ref: '#/components/schemas/api.mediaResponse'
+          type: array
+          uniqueItems: false
+        title:
+          type: string
+        view_count:
+          type: integer
+      type: object
+    api.listPostsItemResponse:
+      properties:
+        author:
+          $ref: '#/components/schemas/api.authorResponse'
+        content:
+          type: string
+        cover_url:
+          type: string
+        created_at:
+          type: string
+        id:
+          type: string
+        title:
+          type: string
+        view_count:
+          type: integer
+      type: object
+    api.loginRequest:
+      properties:
+        password:
+          type: string
+        username:
+          type: string
+      required:
+      - password
+      - username
+      type: object
+    api.mediaResponse:
+      properties:
+        id:
+          type: string
+        media_type:
+          type: string
+        media_url:
+          type: string
+        sort_order:
+          type: integer
+      type: object
+    api.registerRequest:
+      properties:
+        password:
+          maxLength: 128
+          minLength: 6
+          type: string
+        username:
+          maxLength: 32
+          minLength: 3
+          type: string
+      required:
+      - password
+      - username
+      type: object
+    api.toggleLikeRequest:
+      properties:
+        target_id:
+          type: string
+        target_type:
+          enum:
+          - 1
+          - 2
+          type: integer
+      required:
+      - target_id
+      - target_type
+      type: object
+    api.toggleLikeResponse:
+      properties:
+        ok:
+          type: boolean
+      type: object
+    api.updateProfileRequest:
+      properties:
+        avatar_url:
+          type: string
+        bio:
+          maxLength: 200
+          type: string
+        username:
+          maxLength: 32
+          minLength: 3
+          type: string
+      required:
+      - username
+      type: object
+    api.userResponse:
+      properties:
+        avatar_url:
+          type: string
+        bio:
+          type: string
+        id:
+          type: string
+        username:
+          type: string
+      type: object
+    render.Response-api_authResponse:
+      properties:
+        code:
+          type: integer
+        data:
+          $ref: '#/components/schemas/api.authResponse'
+        msg:
+          type: string
+      type: object
+    render.Response-api_createCommentResponse:
+      properties:
+        code:
+          type: integer
+        data:
+          $ref: '#/components/schemas/api.createCommentResponse'
+        msg:
+          type: string
+      type: object
+    render.Response-api_createPostResponse:
+      properties:
+        code:
+          type: integer
+        data:
+          $ref: '#/components/schemas/api.createPostResponse'
+        msg:
+          type: string
+      type: object
+    render.Response-api_followResponse:
+      properties:
+        code:
+          type: integer
+        data:
+          $ref: '#/components/schemas/api.followResponse'
+        msg:
+          type: string
+      type: object
+    render.Response-api_getPostsResponse:
+      properties:
+        code:
+          type: integer
+        data:
+          $ref: '#/components/schemas/api.getPostsResponse'
+        msg:
+          type: string
+      type: object
+    render.Response-api_toggleLikeResponse:
+      properties:
+        code:
+          type: integer
+        data:
+          $ref: '#/components/schemas/api.toggleLikeResponse'
+        msg:
+          type: string
+      type: object
+    render.Response-api_userResponse:
+      properties:
+        code:
+          type: integer
+        data:
+          $ref: '#/components/schemas/api.userResponse'
+        msg:
+          type: string
+      type: object
+    render.Response-array_api_commentResponse:
+      properties:
+        code:
+          type: integer
+        data:
+          items:
+            $ref: '#/components/schemas/api.commentResponse'
+          type: array
+          uniqueItems: false
+        msg:
+          type: string
+      type: object
+    render.Response-array_api_followUserResponse:
+      properties:
+        code:
+          type: integer
+        data:
+          items:
+            $ref: '#/components/schemas/api.followUserResponse'
+          type: array
+          uniqueItems: false
+        msg:
+          type: string
+      type: object
+    render.Response-array_api_listPostsItemResponse:
+      properties:
+        code:
+          type: integer
+        data:
+          items:
+            $ref: '#/components/schemas/api.listPostsItemResponse'
+          type: array
+          uniqueItems: false
+        msg:
+          type: string
+      type: object
+    render.ResponseWithoutData:
+      properties:
+        code:
+          type: integer
+        msg:
+          type: string
+      type: object
+    render.errorResponse:
+      properties:
+        code:
+          type: integer
+        msg:
+          type: string
+      type: object
+  securitySchemes:
+    BearerAuth:
+      scheme: bearer
+      type: http
+externalDocs:
+  description: ""
+  url: ""
 info:
-  contact: {}
   description: 小蓝书后端接口文档
   title: 小蓝书 API
   version: "1.0"
+openapi: 3.1.0
 paths:
   /comments:
     post:
-      parameters:
-      - description: 评论内容
-        in: body
-        name: body
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/api.createCommentRequest'
+              description: 评论内容
+              summary: body
+        description: 评论内容
         required: true
-        schema:
-          $ref: '#/definitions/api.createCommentRequest'
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.Response-api_createCommentResponse'
           description: OK
-          schema:
-            $ref: '#/definitions/render.Response-api_createCommentResponse'
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/render.errorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/render.errorResponse'
       security:
       - BearerAuth: []
       summary: 创建评论
@@ -367,26 +385,34 @@ paths:
       - comments
   /likes:
     post:
-      parameters:
-      - description: 点赞信息
-        in: body
-        name: body
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/api.toggleLikeRequest'
+              description: 点赞信息
+              summary: body
+        description: 点赞信息
         required: true
-        schema:
-          $ref: '#/definitions/api.toggleLikeRequest'
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.Response-api_toggleLikeResponse'
           description: OK
-          schema:
-            $ref: '#/definitions/render.Response-api_toggleLikeResponse'
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/render.errorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/render.errorResponse'
       security:
       - BearerAuth: []
       summary: 切换点赞状态
@@ -395,49 +421,63 @@ paths:
   /posts:
     get:
       parameters:
-      - default: 1
-        description: 页码
+      - description: 页码
         in: query
         name: page
-        type: integer
-      - default: 20
-        description: 每页数量
+        schema:
+          default: 1
+          type: integer
+      - description: 每页数量
         in: query
         name: page_size
-        type: integer
+        schema:
+          default: 20
+          type: integer
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.Response-array_api_listPostsItemResponse'
           description: OK
-          schema:
-            $ref: '#/definitions/render.Response-array_api_listPostsItemResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/render.errorResponse'
       summary: 获取帖子列表
       tags:
       - posts
     post:
-      parameters:
-      - description: 帖子内容
-        in: body
-        name: body
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/api.createPostRequest'
+              description: 帖子内容
+              summary: body
+        description: 帖子内容
         required: true
-        schema:
-          $ref: '#/definitions/api.createPostRequest'
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.Response-api_createPostResponse'
           description: OK
-          schema:
-            $ref: '#/definitions/render.Response-api_createPostResponse'
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/render.errorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/render.errorResponse'
       security:
       - BearerAuth: []
       summary: 创建帖子
@@ -450,20 +490,27 @@ paths:
         in: path
         name: id
         required: true
-        type: string
+        schema:
+          type: string
       responses:
         "204":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.ResponseWithoutData'
           description: No Content
-          schema:
-            $ref: '#/definitions/render.ResponseWithoutData'
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/render.errorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/render.errorResponse'
       security:
       - BearerAuth: []
       summary: 删除帖子
@@ -475,20 +522,27 @@ paths:
         in: path
         name: id
         required: true
-        type: string
+        schema:
+          type: string
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.Response-api_getPostsResponse'
           description: OK
-          schema:
-            $ref: '#/definitions/render.Response-api_getPostsResponse'
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/render.errorResponse'
         "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.errorResponse'
           description: Not Found
-          schema:
-            $ref: '#/definitions/render.errorResponse'
       summary: 获取帖子详情
       tags:
       - posts
@@ -499,30 +553,39 @@ paths:
         in: query
         name: post_id
         required: true
-        type: string
-      - default: 1
-        description: 页码
+        schema:
+          type: string
+      - description: 页码
         in: query
         name: page
-        type: integer
-      - default: 20
-        description: 每页数量
+        schema:
+          default: 1
+          type: integer
+      - description: 每页数量
         in: query
         name: page_size
-        type: integer
+        schema:
+          default: 20
+          type: integer
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.Response-array_api_commentResponse'
           description: OK
-          schema:
-            $ref: '#/definitions/render.Response-array_api_commentResponse'
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/render.errorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/render.errorResponse'
       summary: 获取帖子评论列表
       tags:
       - comments
@@ -533,30 +596,39 @@ paths:
         in: path
         name: userID
         required: true
-        type: string
-      - default: 1
-        description: 页码
+        schema:
+          type: string
+      - description: 页码
         in: query
         name: page
-        type: integer
-      - default: 20
-        description: 每页数量
+        schema:
+          default: 1
+          type: integer
+      - description: 每页数量
         in: query
         name: page_size
-        type: integer
+        schema:
+          default: 20
+          type: integer
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.Response-array_api_listPostsItemResponse'
           description: OK
-          schema:
-            $ref: '#/definitions/render.Response-array_api_listPostsItemResponse'
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/render.errorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/render.errorResponse'
       summary: 获取指定用户的帖子列表
       tags:
       - posts
@@ -567,20 +639,27 @@ paths:
         in: path
         name: id
         required: true
-        type: string
+        schema:
+          type: string
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.Response-api_userResponse'
           description: OK
-          schema:
-            $ref: '#/definitions/render.Response-api_userResponse'
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/render.errorResponse'
         "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.errorResponse'
           description: Not Found
-          schema:
-            $ref: '#/definitions/render.errorResponse'
       summary: 获取用户资料
       tags:
       - users
@@ -591,20 +670,27 @@ paths:
         in: path
         name: id
         required: true
-        type: string
+        schema:
+          type: string
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.Response-api_followResponse'
           description: OK
-          schema:
-            $ref: '#/definitions/render.Response-api_followResponse'
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/render.errorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/render.errorResponse'
       security:
       - BearerAuth: []
       summary: 取消关注
@@ -616,20 +702,27 @@ paths:
         in: path
         name: id
         required: true
-        type: string
+        schema:
+          type: string
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.Response-api_followResponse'
           description: OK
-          schema:
-            $ref: '#/definitions/render.Response-api_followResponse'
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/render.errorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/render.errorResponse'
       security:
       - BearerAuth: []
       summary: 关注用户
@@ -642,30 +735,39 @@ paths:
         in: path
         name: id
         required: true
-        type: string
-      - default: 1
-        description: 页码
+        schema:
+          type: string
+      - description: 页码
         in: query
         name: page
-        type: integer
-      - default: 20
-        description: 每页数量
+        schema:
+          default: 1
+          type: integer
+      - description: 每页数量
         in: query
         name: page_size
-        type: integer
+        schema:
+          default: 20
+          type: integer
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.Response-array_api_followUserResponse'
           description: OK
-          schema:
-            $ref: '#/definitions/render.Response-array_api_followUserResponse'
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/render.errorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/render.errorResponse'
       summary: 获取粉丝列表
       tags:
       - follows
@@ -676,80 +778,105 @@ paths:
         in: path
         name: id
         required: true
-        type: string
-      - default: 1
-        description: 页码
+        schema:
+          type: string
+      - description: 页码
         in: query
         name: page
-        type: integer
-      - default: 20
-        description: 每页数量
+        schema:
+          default: 1
+          type: integer
+      - description: 每页数量
         in: query
         name: page_size
-        type: integer
+        schema:
+          default: 20
+          type: integer
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.Response-array_api_followUserResponse'
           description: OK
-          schema:
-            $ref: '#/definitions/render.Response-array_api_followUserResponse'
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/render.errorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/render.errorResponse'
       summary: 获取关注列表
       tags:
       - follows
   /users/login:
     post:
-      parameters:
-      - description: 登录信息
-        in: body
-        name: body
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/api.loginRequest'
+              description: 登录信息
+              summary: body
+        description: 登录信息
         required: true
-        schema:
-          $ref: '#/definitions/api.loginRequest'
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.Response-api_authResponse'
           description: OK
-          schema:
-            $ref: '#/definitions/render.Response-api_authResponse'
         "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.errorResponse'
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/render.errorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/render.errorResponse'
       summary: 用户登录
       tags:
       - users
   /users/profile:
     put:
-      parameters:
-      - description: 更新信息
-        in: body
-        name: body
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/api.updateProfileRequest'
+              description: 更新信息
+              summary: body
+        description: 更新信息
         required: true
-        schema:
-          $ref: '#/definitions/api.updateProfileRequest'
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.Response-api_userResponse'
           description: OK
-          schema:
-            $ref: '#/definitions/render.Response-api_userResponse'
         "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.errorResponse'
           description: Bad Request
-          schema:
-            $ref: '#/definitions/render.errorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/render.errorResponse'
       security:
       - BearerAuth: []
       summary: 更新用户资料
@@ -757,31 +884,37 @@ paths:
       - users
   /users/register:
     post:
-      parameters:
-      - description: 注册信息
-        in: body
-        name: body
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/api.registerRequest'
+              description: 注册信息
+              summary: body
+        description: 注册信息
         required: true
-        schema:
-          $ref: '#/definitions/api.registerRequest'
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.Response-api_authResponse'
           description: OK
-          schema:
-            $ref: '#/definitions/render.Response-api_authResponse'
         "409":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.errorResponse'
           description: Conflict
-          schema:
-            $ref: '#/definitions/render.errorResponse'
         "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/render.errorResponse'
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/render.errorResponse'
       summary: 用户注册
       tags:
       - users
-produces:
-- application/json
-schemes:
-- http
-swagger: "2.0"
+servers:
+- description: 本地开发环境
+  url: http://localhost:8080/api/v1

@@ -28,6 +28,8 @@ type toggleLikeResponse struct {
 	OK bool `json:"ok"`
 }
 
+// 切换点赞状态
+//
 //	@Summary	切换点赞状态
 //	@Tags		likes
 //	@Security	BearerAuth

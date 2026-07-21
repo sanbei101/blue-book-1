@@ -26,6 +26,8 @@ type followResponse struct {
 	OK bool `json:"ok"`
 }
 
+// 关注用户
+//
 //	@Summary	关注用户
 //	@Tags		follows
 //	@Security	BearerAuth
@@ -63,6 +65,8 @@ func (h *FollowHandler) Follow(w http.ResponseWriter, r *http.Request) {
 
 // ---- 取消关注 ----
 
+// 取消关注
+//
 //	@Summary	取消关注
 //	@Tags		follows
 //	@Security	BearerAuth
@@ -116,6 +120,8 @@ func toFollowUserResponse(u *db.ListFollowersRow) followUserResponse {
 	return resp
 }
 
+// 获取粉丝列表
+//
 //	@Summary	获取粉丝列表
 //	@Tags		follows
 //	@Param		id			path		string	true	"用户 ID"
@@ -156,6 +162,8 @@ func (h *FollowHandler) ListFollowers(w http.ResponseWriter, r *http.Request) {
 
 // ---- 关注列表 ----
 
+// 获取关注列表
+//
 //	@Summary	获取关注列表
 //	@Tags		follows
 //	@Param		id			path		string	true	"用户 ID"

@@ -32,6 +32,8 @@ type createCommentResponse struct {
 	ID uuid.UUID `json:"id"`
 }
 
+// 创建评论
+//
 //	@Summary	创建评论
 //	@Tags		comments
 //	@Security	BearerAuth
@@ -76,6 +78,8 @@ type commentResponse struct {
 	CreatedAt      time.Time  `json:"created_at"`
 }
 
+// 获取帖子评论列表
+//
 //	@Summary	获取帖子评论列表
 //	@Tags		comments
 //	@Param		post_id		query		string	true	"帖子 ID"

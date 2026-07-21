@@ -10,13 +10,13 @@ import (
 	"github.com/sanbei101/blue-book/internal/pkg/jwt"
 )
 
+// OpenAPI 定义
+//
 //	@title							小蓝书 API
 //	@version						1.0
 //	@description					小蓝书后端接口文档
-//	@BasePath						/api/v1
-//	@accept							json
-//	@produce						json
-//	@schemes						http
+//	@servers.url					http://localhost:8080/api/v1
+//	@servers.description			本地开发环境
 //	@securitydefinitions.bearerauth	BearerAuth
 func RegisterRoutes(store *db.Store) *chi.Mux {
 	r := chi.NewRouter()

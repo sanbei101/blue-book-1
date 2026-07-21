@@ -105,6 +105,8 @@ func toMediaResponse(m *db.PostMedium) mediaResponse {
 	}
 }
 
+// 创建帖子
+//
 //	@Summary	创建帖子
 //	@Tags		posts
 //	@Security	BearerAuth
@@ -164,6 +166,8 @@ func (h *PostHandler) Create(w http.ResponseWriter, r *http.Request) {
 	render.Success(w, "创建成功", createPostResponse{ID: created.ID})
 }
 
+// 获取帖子列表
+//
 //	@Summary	获取帖子列表
 //	@Tags		posts
 //	@Param		page		query		int	false	"页码"	default(1)
@@ -198,6 +202,8 @@ func (h *PostHandler) ListFeed(w http.ResponseWriter, r *http.Request) {
 	render.Success(w, "查询成功", posts)
 }
 
+// 获取帖子详情
+//
 //	@Summary	获取帖子详情
 //	@Tags		posts
 //	@Param		id	path		string	true	"帖子 ID"
@@ -246,6 +252,8 @@ func (h *PostHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// 获取指定用户的帖子列表
+//
 //	@Summary	获取指定用户的帖子列表
 //	@Tags		posts
 //	@Param		userID		path		string	true	"用户 ID"
@@ -289,6 +297,8 @@ func (h *PostHandler) ListByUser(w http.ResponseWriter, r *http.Request) {
 	render.Success(w, "查询成功", posts)
 }
 
+// 删除帖子
+//
 //	@Summary	删除帖子
 //	@Tags		posts
 //	@Security	BearerAuth

@@ -54,6 +54,8 @@ func toUserResponse(u *db.User) userResponse {
 	return resp
 }
 
+// 用户注册
+//
 //	@Summary	用户注册
 //	@Tags		users
 //	@Param		body	body		registerRequest	true	"注册信息"
@@ -101,6 +103,8 @@ type loginRequest struct {
 	Password string `json:"password" validate:"required"`
 }
 
+// 用户登录
+//
 //	@Summary	用户登录
 //	@Tags		users
 //	@Param		body	body		loginRequest	true	"登录信息"
@@ -139,8 +143,8 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// ---- 获取用户资料 ----
-
+// 获取用户资料
+//
 //	@Summary	获取用户资料
 //	@Tags		users
 //	@Param		id	path		string	true	"用户 ID"
@@ -173,6 +177,8 @@ type updateProfileRequest struct {
 	Bio       string `json:"bio"        validate:"max=200"`
 }
 
+// 更新用户资料
+//
 //	@Summary	更新用户资料
 //	@Tags		users
 //	@Security	BearerAuth
