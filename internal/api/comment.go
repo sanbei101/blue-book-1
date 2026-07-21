@@ -88,7 +88,7 @@ type commentResponse struct {
 //	@Success	200			{object}	render.Response[[]commentResponse]
 //	@Failure	400			{object}	render.errorResponse
 //	@Failure	500			{object}	render.errorResponse
-//	@Router		/posts/{id}/comments [get]
+//	@Router		/posts/{id}/comments    [get]
 func (h *CommentHandler) ListByPost(w http.ResponseWriter, r *http.Request) {
 	postIDStr := r.URL.Query().Get("post_id")
 	postID, err := uuid.Parse(postIDStr)

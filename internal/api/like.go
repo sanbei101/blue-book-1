@@ -20,7 +20,7 @@ func NewLikeHandler(store *db.Store) *LikeHandler {
 }
 
 type toggleLikeRequest struct {
-	TargetID   uuid.UUID `json:"target_id"   validate:"required"`
+	TargetID   uuid.UUID `json:"target_id"   validate:"required,uuid"`
 	TargetType int16     `json:"target_type" validate:"required,oneof=1 2"`
 }
 
@@ -37,7 +37,7 @@ type toggleLikeResponse struct {
 //	@Success	200		{object}	render.Response[toggleLikeResponse]
 //	@Failure	400		{object}	render.errorResponse
 //	@Failure	500		{object}	render.errorResponse
-//	@Router		/likes [post]
+//	@Router		/likes  [post]
 func (h *LikeHandler) Toggle(w http.ResponseWriter, r *http.Request) {
 	body, err := render.ReadBody[toggleLikeRequest](w, r)
 	if err != nil {

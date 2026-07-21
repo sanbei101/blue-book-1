@@ -35,7 +35,7 @@ type followResponse struct {
 //	@Success	200	{object}	render.Response[followResponse]
 //	@Failure	400	{object}	render.errorResponse
 //	@Failure	500	{object}	render.errorResponse
-//	@Router		/users/{id}/follow [post]
+//	@Router		/users/{id}/follow  [post]
 func (h *FollowHandler) Follow(w http.ResponseWriter, r *http.Request) {
 	followingIDStr := chi.URLParam(r, "id")
 	followingID, err := uuid.Parse(followingIDStr)

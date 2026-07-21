@@ -46,7 +46,7 @@ type createPostRequest struct {
 	Media   []createMediaItem `json:"media"`
 }
 type createMediaItem struct {
-	MediaURL  string `json:"media_url"  validate:"required"`
+	MediaURL  string `json:"media_url"  validate:"required,url"`
 	MediaType string `json:"media_type" validate:"required,oneof=image video"`
 	SortOrder int16  `json:"sort_order"`
 }
@@ -306,7 +306,7 @@ func (h *PostHandler) ListByUser(w http.ResponseWriter, r *http.Request) {
 //	@Success	204	{object}	render.ResponseWithoutData
 //	@Failure	400	{object}	render.errorResponse
 //	@Failure	500	{object}	render.errorResponse
-//	@Router		/posts/{id} [delete]
+//	@Router		/posts/{id}     [delete]
 func (h *PostHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := uuid.Parse(idStr)

@@ -62,7 +62,7 @@ func toUserResponse(u *db.User) userResponse {
 //	@Success	200		{object}	render.Response[authResponse]
 //	@Failure	409		{object}	render.errorResponse
 //	@Failure	500		{object}	render.errorResponse
-//	@Router		/users/register [post]
+//	@Router		/users/register     [post]
 func (h *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 	body, err := render.ReadBody[registerRequest](w, r)
 	if err != nil {
