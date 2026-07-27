@@ -45,7 +45,7 @@ func (s *Seeder) Run(ctx context.Context) error {
 	}
 
 	// 创建帖子 + 媒体
-	posts, err := s.seedPosts(ctx, users)
+	posts, media, err := s.seedPosts(ctx, users)
 	if err != nil {
 		return fmt.Errorf("seed posts: %w", err)
 	}
@@ -68,12 +68,20 @@ func (s *Seeder) Run(ctx context.Context) error {
 		return fmt.Errorf("seed follows: %w", err)
 	}
 
+	// 导出 SQL 文件
+	filename := fmt.Sprintf("seed_%s.sql", time.Now().Format("20060102_150405"))
+	if err := ExportSQL(filename, users, posts, media, comments, likes, follows); err != nil {
+		log.Error().Err(err).Msg("Failed to export seed SQL")
+	} else {
+		log.Info().Str("file", filename).Msg("Seed SQL exported")
+	}
+
 	log.Info().
 		Int("users", len(users)).
 		Int("posts", len(posts)).
 		Int("comments", len(comments)).
-		Int("likes", likes).
-		Int("follows", follows).
+		Int("likes", len(likes)).
+		Int("follows", len(follows)).
 		Dur("elapsed", time.Since(start)).
 		Msg("Seed complete")
 

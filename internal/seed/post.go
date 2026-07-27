@@ -3,7 +3,8 @@ package seed
 import (
 	"context"
 	"fmt"
-	"log"
+
+	"github.com/phuslu/log"
 
 	"github.com/google/uuid"
 
@@ -11,22 +12,27 @@ import (
 )
 
 // seedPosts 创建种子帖子和媒体
-func (s *Seeder) seedPosts(ctx context.Context, users []db.User) ([]db.Post, error) {
+func (s *Seeder) seedPosts(ctx context.Context, users []db.User) ([]db.Post, []db.PostMedium, error) {
 	posts := make([]db.Post, 0, len(postSeeds))
+	allMedia := make([]db.PostMedium, 0, len(postSeeds)*3)
 
 	// 预先获取所有帖子的卡片 URL
-	log.Println("Fetching card URLs from card engine...")
-	cardURLs := make([][]string, 0, len(postSeeds))
-	for _, p := range postSeeds {
+	total := len(postSeeds)
+	log.Printf("Fetching card URLs from card engine... (0/%d)", total)
+	cardURLs := make([][]string, 0, total)
+	for i, p := range postSeeds {
+		log.Printf("[%d/%d] Fetching cards for %q...", i+1, total, p.Title)
 		urls, err := cards.fetchCardURLs(ctx, s.rng, p.Title)
 		if err != nil {
-			log.Printf("Warning: failed to fetch cards for %q: %v, using fallback", p.Title, err)
-			// 使用默认的 picsum 作为 fallback
+			log.Printf("[%d/%d] Warning: failed to fetch cards: %v, using fallback", i+1, total, err)
+			// 使用 picsum 作为 fallback
 			cardURLs = append(cardURLs, nil)
 			continue
 		}
 		cardURLs = append(cardURLs, urls)
+		log.Printf("[%d/%d] Done ✓", i+1, total)
 	}
+	log.Printf("Card URLs fetched successfully (%d/%d)", total, total)
 
 	for i, p := range postSeeds {
 		author := users[s.rng.IntN(len(users))]
@@ -38,7 +44,7 @@ func (s *Seeder) seedPosts(ctx context.Context, users []db.User) ([]db.Post, err
 			Content: p.Content,
 		})
 		if err != nil {
-			return nil, fmt.Errorf("create post %d: %w", i, err)
+			return nil, nil, fmt.Errorf("create post %d: %w", i, err)
 		}
 
 		// 添加媒体图片
@@ -68,12 +74,22 @@ func (s *Seeder) seedPosts(ctx context.Context, users []db.User) ([]db.Post, err
 
 		if len(mediaParams) > 0 {
 			if _, err := s.store.CreatePostMedia(ctx, mediaParams); err != nil {
-				return nil, fmt.Errorf("create post media for post %d: %w", i, err)
+				return nil, nil, fmt.Errorf("create post media for post %d: %w", i, err)
+			}
+			// 收集媒体数据用于导出
+			for _, param := range mediaParams {
+				allMedia = append(allMedia, db.PostMedium{
+					ID:        param.ID,
+					PostID:    param.PostID,
+					MediaURL:  param.MediaURL,
+					MediaType: param.MediaType,
+					SortOrder: param.SortOrder,
+				})
 			}
 		}
 
 		posts = append(posts, post)
 	}
 
-	return posts, nil
+	return posts, allMedia, nil
 }

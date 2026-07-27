@@ -10,8 +10,8 @@ import (
 )
 
 // seedLikes 创建种子点赞(帖子点赞 + 评论点赞)
-func (s *Seeder) seedLikes(ctx context.Context, users []db.User, posts []db.Post, comments []db.Comment) (int, error) {
-	count := 0
+func (s *Seeder) seedLikes(ctx context.Context, users []db.User, posts []db.Post, comments []db.Comment) ([]db.Like, error) {
+	likes := make([]db.Like, 0)
 	seen := make(map[string]bool)
 
 	// 帖子点赞:每个帖子 3-8 个赞
@@ -25,16 +25,22 @@ func (s *Seeder) seedLikes(ctx context.Context, users []db.User, posts []db.Post
 			}
 			seen[key] = true
 
+			likeID := uuid.Must(uuid.NewV7())
 			err := s.store.ToggleLike(ctx, db.ToggleLikeParams{
-				ID:         uuid.Must(uuid.NewV7()),
+				ID:         likeID,
 				UserID:     user.ID,
 				TargetID:   post.ID,
 				TargetType: 1, // 帖子
 			})
 			if err != nil {
-				return 0, fmt.Errorf("like post: %w", err)
+				return nil, fmt.Errorf("like post: %w", err)
 			}
-			count++
+			likes = append(likes, db.Like{
+				ID:         likeID,
+				UserID:     user.ID,
+				TargetID:   post.ID,
+				TargetType: 1,
+			})
 		}
 	}
 
@@ -49,25 +55,31 @@ func (s *Seeder) seedLikes(ctx context.Context, users []db.User, posts []db.Post
 			}
 			seen[key] = true
 
+			likeID := uuid.Must(uuid.NewV7())
 			err := s.store.ToggleLike(ctx, db.ToggleLikeParams{
-				ID:         uuid.Must(uuid.NewV7()),
+				ID:         likeID,
 				UserID:     user.ID,
 				TargetID:   comment.ID,
 				TargetType: 2, // 评论
 			})
 			if err != nil {
-				return 0, fmt.Errorf("like comment: %w", err)
+				return nil, fmt.Errorf("like comment: %w", err)
 			}
-			count++
+			likes = append(likes, db.Like{
+				ID:         likeID,
+				UserID:     user.ID,
+				TargetID:   comment.ID,
+				TargetType: 2,
+			})
 		}
 	}
 
-	return count, nil
+	return likes, nil
 }
 
 // seedFollows 创建种子关注关系
-func (s *Seeder) seedFollows(ctx context.Context, users []db.User) (int, error) {
-	count := 0
+func (s *Seeder) seedFollows(ctx context.Context, users []db.User) ([]db.Follow, error) {
+	follows := make([]db.Follow, 0)
 	seen := make(map[string]bool)
 
 	// 每个用户关注 3-8 个其他用户
@@ -91,11 +103,14 @@ func (s *Seeder) seedFollows(ctx context.Context, users []db.User) (int, error) 
 				FollowingID: following.ID,
 			})
 			if err != nil {
-				return 0, fmt.Errorf("follow: %w", err)
+				return nil, fmt.Errorf("follow: %w", err)
 			}
-			count++
+			follows = append(follows, db.Follow{
+				FollowerID:  follower.ID,
+				FollowingID: following.ID,
+			})
 		}
 	}
 
-	return count, nil
+	return follows, nil
 }
