@@ -1,7 +1,5 @@
 package seed
 
-import "strconv"
-
 // 用户数据池
 var userSeeds = []struct {
 	Username string
@@ -258,11 +256,6 @@ var replySeeds = []string{
 	"哈哈,确实是这样",
 	"明白,我去补一下这块知识",
 	"谢谢大佬解答 🙏",
-}
-
-// 帖子媒体 URL 模板(使用 picsum.photos)
-func mediaURL(seed int) string {
-	return "https://picsum.photos/seed/" + strconv.Itoa(seed) + "/800/600"
 }
 
 // 头像 URL 模板(使用 Dicebear)

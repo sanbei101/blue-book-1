@@ -16,9 +16,9 @@ func (s *Seeder) seedLikes(ctx context.Context, users []db.User, posts []db.Post
 
 	// 帖子点赞:每个帖子 3-8 个赞
 	for _, post := range posts {
-		likeCount := s.rng.Intn(6) + 3
+		likeCount := s.rng.IntN(6) + 3
 		for range likeCount {
-			user := users[s.rng.Intn(len(users))]
+			user := users[s.rng.IntN(len(users))]
 			key := user.ID.String() + post.ID.String() + "1"
 			if seen[key] {
 				continue
@@ -40,9 +40,9 @@ func (s *Seeder) seedLikes(ctx context.Context, users []db.User, posts []db.Post
 
 	// 评论点赞:每个评论 0-3 个赞
 	for _, comment := range comments {
-		likeCount := s.rng.Intn(4)
+		likeCount := s.rng.IntN(4)
 		for range likeCount {
-			user := users[s.rng.Intn(len(users))]
+			user := users[s.rng.IntN(len(users))]
 			key := user.ID.String() + comment.ID.String() + "2"
 			if seen[key] {
 				continue
@@ -73,9 +73,9 @@ func (s *Seeder) seedFollows(ctx context.Context, users []db.User) (int, error) 
 	// 每个用户关注 3-8 个其他用户
 	for i := range users {
 		follower := &users[i]
-		followCount := s.rng.Intn(6) + 3
+		followCount := s.rng.IntN(6) + 3
 		for range followCount {
-			following := &users[s.rng.Intn(len(users))]
+			following := &users[s.rng.IntN(len(users))]
 			if follower.ID == following.ID {
 				continue
 			}

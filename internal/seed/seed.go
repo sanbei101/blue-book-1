@@ -3,7 +3,7 @@ package seed
 import (
 	"context"
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -19,10 +19,13 @@ type Seeder struct {
 }
 
 func NewSeeder(pool *pgxpool.Pool) *Seeder {
+	seed1 := uint64(time.Now().UnixNano())
+	seed2 := rand.Uint64()
+
 	return &Seeder{
 		store: db.NewStore(pool),
 		pool:  pool,
-		rng:   rand.New(rand.NewSource(time.Now().UnixNano())),
+		rng:   rand.New(rand.NewPCG(seed1, seed2)),
 	}
 }
 

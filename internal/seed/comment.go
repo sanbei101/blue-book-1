@@ -15,15 +15,15 @@ func (s *Seeder) seedComments(ctx context.Context, users []db.User, posts []db.P
 
 	for _, post := range posts {
 		// 每个帖子 2-4 条一级评论
-		topLevelCount := s.rng.Intn(3) + 2
+		topLevelCount := s.rng.IntN(3) + 2
 		for range topLevelCount {
-			commenter := users[s.rng.Intn(len(users))]
+			commenter := users[s.rng.IntN(len(users))]
 
 			comment, err := s.store.CreateComment(ctx, db.CreateCommentParams{
 				ID:      uuid.Must(uuid.NewV7()),
 				PostID:  post.ID,
 				UserID:  commenter.ID,
-				Content: commentSeeds[s.rng.Intn(len(commentSeeds))],
+				Content: commentSeeds[s.rng.IntN(len(commentSeeds))],
 			})
 			if err != nil {
 				return nil, fmt.Errorf("create comment: %w", err)
@@ -32,17 +32,17 @@ func (s *Seeder) seedComments(ctx context.Context, users []db.User, posts []db.P
 			comments = append(comments, comment)
 
 			// 50% 概率生成嵌套回复(1-2 条)
-			if s.rng.Intn(2) == 0 {
-				replyCount := s.rng.Intn(2) + 1
+			if s.rng.IntN(2) == 0 {
+				replyCount := s.rng.IntN(2) + 1
 				for range replyCount {
-					replier := users[s.rng.Intn(len(users))]
+					replier := users[s.rng.IntN(len(users))]
 
 					reply, err := s.store.CreateComment(ctx, db.CreateCommentParams{
 						ID:       uuid.Must(uuid.NewV7()),
 						PostID:   post.ID,
 						UserID:   replier.ID,
 						ParentID: &comment.ID,
-						Content:  replySeeds[s.rng.Intn(len(replySeeds))],
+						Content:  replySeeds[s.rng.IntN(len(replySeeds))],
 					})
 					if err != nil {
 						return nil, fmt.Errorf("create reply: %w", err)

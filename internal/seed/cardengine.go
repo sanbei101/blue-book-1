@@ -1,0 +1,124 @@
+package seed
+
+import (
+	"bytes"
+	"context"
+	"encoding/json/v2"
+	"errors"
+	"fmt"
+	"math/rand/v2"
+	"net/http"
+	"sync"
+	"time"
+)
+
+const cardEngineURL = "https://blue-card-render.sanbei.codes/proto.cardengine.v1.CardEngineService/CardsList"
+
+// 所有可用模板 ID
+var allTemplateIDs = []string{
+	// 清新文艺
+	"question-blue",
+	"green-notebook",
+	"beige-paper",
+	"lavender-soft",
+	// 活力醒目
+	"orange-burst",
+	"red-stamp",
+	"pink-bubble",
+	// 沉稳专业
+	"editorial-black",
+	"blue-grid",
+	"mono-frame",
+	// 深色主题
+	"midnight-stars",
+	// 复古怀旧
+	"yellow-memo",
+}
+
+// cardEngineRequest 卡片引擎 API 请求体
+type cardEngineRequest struct {
+	Title       string   `json:"title,omitempty"`
+	Keyword     string   `json:"keyword,omitempty"`
+	TemplateIDs []string `json:"templateIds,omitempty"`
+}
+
+// cardEngineResponse 卡片引擎 API 响应体
+type cardEngineResponse struct {
+	Templates []struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
+		URL  string `json:"url"`
+	} `json:"templates"`
+}
+
+// cardCache 卡片 URL 缓存
+type cardCache struct {
+	mu    sync.RWMutex
+	cache map[string][]string
+}
+
+var cards = &cardCache{
+	cache: make(map[string][]string),
+}
+
+// fetchCardURLs 调用卡片引擎 API 获取卡片图片 URL
+func (c *cardCache) fetchCardURLs(ctx context.Context, rng *rand.Rand, title string) ([]string, error) {
+	// 检查缓存
+	c.mu.RLock()
+	if urls, ok := c.cache[title]; ok {
+		c.mu.RUnlock()
+		return urls, nil
+	}
+	c.mu.RUnlock()
+
+	// 构建请求
+	reqBody := cardEngineRequest{
+		Title:       title,
+		TemplateIDs: []string{allTemplateIDs[rng.IntN(len(allTemplateIDs))]},
+	}
+	body, err := json.Marshal(reqBody)
+	if err != nil {
+		return nil, fmt.Errorf("marshal request: %w", err)
+	}
+
+	// 发送请求
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, cardEngineURL, bytes.NewReader(body))
+	if err != nil {
+		return nil, fmt.Errorf("create request: %w", err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{Timeout: 30 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("send request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected status: %d", resp.StatusCode)
+	}
+
+	var result cardEngineResponse
+	if err := json.UnmarshalRead(resp.Body, &result); err != nil {
+		return nil, fmt.Errorf("decode response: %w", err)
+	}
+
+	if len(result.Templates) == 0 {
+		return nil, errors.New("no templates returned")
+	}
+
+	urls := make([]string, 0, len(result.Templates))
+	for _, t := range result.Templates {
+		if t.URL != "" {
+			urls = append(urls, t.URL)
+		}
+	}
+
+	// 缓存结果
+	c.mu.Lock()
+	c.cache[title] = urls
+	c.mu.Unlock()
+
+	return urls, nil
+}
