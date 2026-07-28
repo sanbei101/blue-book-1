@@ -544,12 +544,12 @@ paths:
       summary: 创建帖子
       tags:
       - posts
-  /posts/{id}:
+  /posts/{post_id}:
     delete:
       parameters:
       - description: 帖子 ID
         in: path
-        name: id
+        name: post_id
         required: true
         schema:
           type: string
@@ -581,7 +581,7 @@ paths:
       parameters:
       - description: 帖子 ID
         in: path
-        name: id
+        name: post_id
         required: true
         schema:
           type: string
@@ -607,11 +607,11 @@ paths:
       summary: 获取帖子详情
       tags:
       - posts
-  /posts/{id}/comments:
+  /posts/{post_id}/comments:
     get:
       parameters:
       - description: 帖子 ID
-        in: query
+        in: path
         name: post_id
         required: true
         schema:
@@ -650,12 +650,12 @@ paths:
       summary: 获取帖子评论列表
       tags:
       - comments
-  /posts/user/{userID}:
+  /posts/user/{user_id}:
     get:
       parameters:
       - description: 用户 ID
         in: path
-        name: userID
+        name: user_id
         required: true
         schema:
           type: string
@@ -693,12 +693,12 @@ paths:
       summary: 获取指定用户的帖子列表
       tags:
       - posts
-  /users/{id}:
+  /users/{user_id}:
     get:
       parameters:
       - description: 用户 ID
         in: path
-        name: id
+        name: user_id
         required: true
         schema:
           type: string
@@ -724,12 +724,12 @@ paths:
       summary: 获取用户资料
       tags:
       - users
-  /users/{id}/follow:
+  /users/{user_id}/follow:
     delete:
       parameters:
       - description: 目标用户 ID
         in: path
-        name: id
+        name: user_id
         required: true
         schema:
           type: string
@@ -761,7 +761,7 @@ paths:
       parameters:
       - description: 目标用户 ID
         in: path
-        name: id
+        name: user_id
         required: true
         schema:
           type: string
@@ -789,12 +789,12 @@ paths:
       summary: 关注用户
       tags:
       - follows
-  /users/{id}/followers:
+  /users/{user_id}/followers:
     get:
       parameters:
       - description: 用户 ID
         in: path
-        name: id
+        name: user_id
         required: true
         schema:
           type: string
@@ -832,12 +832,12 @@ paths:
       summary: 获取粉丝列表
       tags:
       - follows
-  /users/{id}/following:
+  /users/{user_id}/following:
     get:
       parameters:
       - description: 用户 ID
         in: path
-        name: id
+        name: user_id
         required: true
         schema:
           type: string
