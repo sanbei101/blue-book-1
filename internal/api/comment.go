@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"github.com/phuslu/log"
 
@@ -95,15 +96,15 @@ type commentResponse struct {
 //
 //	@Summary	获取帖子评论列表
 //	@Tags		comments
-//	@Param		post_id		query		string	true	"帖子 ID"
+//	@Param		post_id		path		string	true	"帖子 ID"
 //	@Param		page		query		int		false	"页码"	default(1)
 //	@Param		page_size	query		int		false	"每页数量"	default(20)
 //	@Success	200			{object}	render.Response[[]commentResponse]
 //	@Failure	400			{object}	render.errorResponse
 //	@Failure	500			{object}	render.errorResponse
-//	@Router		/posts/{id}/comments    [get]
+//	@Router		/posts/{post_id}/comments    [get]
 func (h *CommentHandler) ListByPost(w http.ResponseWriter, r *http.Request) {
-	postIDStr := r.URL.Query().Get("post_id")
+	postIDStr := chi.URLParam(r, "post_id")
 	postID, err := uuid.Parse(postIDStr)
 	if err != nil {
 		render.Error(w, http.StatusBadRequest, "无效的帖子 ID")

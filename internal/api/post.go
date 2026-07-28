@@ -234,25 +234,25 @@ func (h *PostHandler) ListFeed(w http.ResponseWriter, r *http.Request) {
 //
 //	@Summary	获取帖子详情
 //	@Tags		posts
-//	@Param		id	path		string	true	"帖子 ID"
-//	@Success	200	{object}	render.Response[getPostsResponse]
-//	@Failure	400	{object}	render.errorResponse
-//	@Failure	404	{object}	render.errorResponse
-//	@Router		/posts/{id} [get]
+//	@Param		post_id	path		string	true	"帖子 ID"
+//	@Success	200		{object}	render.Response[getPostsResponse]
+//	@Failure	400		{object}	render.errorResponse
+//	@Failure	404		{object}	render.errorResponse
+//	@Router		/posts/{post_id} [get]
 func (h *PostHandler) GetByID(w http.ResponseWriter, r *http.Request) {
-	idStr := chi.URLParam(r, "id")
-	id, err := uuid.Parse(idStr)
+	postIDStr := chi.URLParam(r, "post_id")
+	postID, err := uuid.Parse(postIDStr)
 	if err != nil {
 		render.Error(w, http.StatusBadRequest, "无效的帖子 ID")
 		return
 	}
 
-	err = h.store.IncrementViewCount(r.Context(), id)
+	err = h.store.IncrementViewCount(r.Context(), postID)
 	if err != nil {
 		log.Error().Err(err).Msg("增加帖子浏览量失败")
 	}
 
-	row, err := h.store.GetPostByID(r.Context(), id)
+	row, err := h.store.GetPostByID(r.Context(), postID)
 	if err != nil {
 		render.Error(w, http.StatusNotFound, "帖子不存在")
 		return
@@ -284,15 +284,15 @@ func (h *PostHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 //
 //	@Summary	获取指定用户的帖子列表
 //	@Tags		posts
-//	@Param		userID		path		string	true	"用户 ID"
+//	@Param		user_id		path		string	true	"用户 ID"
 //	@Param		page		query		int		false	"页码"	default(1)
 //	@Param		page_size	query		int		false	"每页数量"	default(20)
 //	@Success	200			{object}	render.Response[[]listPostsItemResponse]
 //	@Failure	400			{object}	render.errorResponse
 //	@Failure	500			{object}	render.errorResponse
-//	@Router		/posts/user/{userID} [get]
+//	@Router		/posts/user/{user_id} [get]
 func (h *PostHandler) ListByUser(w http.ResponseWriter, r *http.Request) {
-	userIDStr := chi.URLParam(r, "userID")
+	userIDStr := chi.URLParam(r, "user_id")
 	userID, err := uuid.Parse(userIDStr)
 	if err != nil {
 		render.Error(w, http.StatusBadRequest, "无效的用户 ID")
@@ -330,14 +330,14 @@ func (h *PostHandler) ListByUser(w http.ResponseWriter, r *http.Request) {
 //	@Summary	删除帖子
 //	@Tags		posts
 //	@Security	BearerAuth
-//	@Param		id	path		string	true	"帖子 ID"
-//	@Success	204	{object}	render.ResponseWithoutData
-//	@Failure	400	{object}	render.errorResponse
-//	@Failure	500	{object}	render.errorResponse
-//	@Router		/posts/{id}     [delete]
+//	@Param		post_id	path		string	true	"帖子 ID"
+//	@Success	204		{object}	render.ResponseWithoutData
+//	@Failure	400		{object}	render.errorResponse
+//	@Failure	500		{object}	render.errorResponse
+//	@Router		/posts/{post_id} [delete]
 func (h *PostHandler) Delete(w http.ResponseWriter, r *http.Request) {
-	idStr := chi.URLParam(r, "id")
-	id, err := uuid.Parse(idStr)
+	postIDStr := chi.URLParam(r, "post_id")
+	postID, err := uuid.Parse(postIDStr)
 	if err != nil {
 		render.Error(w, http.StatusBadRequest, "无效的帖子 ID")
 		return
@@ -345,7 +345,7 @@ func (h *PostHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	currentUserID := jwt.GetUserIDFromContext(r)
 
 	err = h.store.DeletePost(r.Context(), db.DeletePostParams{
-		ID:     id,
+		ID:     postID,
 		UserID: currentUserID,
 	})
 	if err != nil {

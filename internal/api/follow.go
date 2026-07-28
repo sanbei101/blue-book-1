@@ -32,13 +32,13 @@ type followResponse struct {
 //	@Summary	关注用户
 //	@Tags		follows
 //	@Security	BearerAuth
-//	@Param		id	path		string	true	"目标用户 ID"
-//	@Success	200	{object}	render.Response[followResponse]
-//	@Failure	400	{object}	render.errorResponse
-//	@Failure	500	{object}	render.errorResponse
-//	@Router		/users/{id}/follow  [post]
+//	@Param		user_id	path		string	true	"目标用户 ID"
+//	@Success	200		{object}	render.Response[followResponse]
+//	@Failure	400		{object}	render.errorResponse
+//	@Failure	500		{object}	render.errorResponse
+//	@Router		/users/{user_id}/follow [post]
 func (h *FollowHandler) Follow(w http.ResponseWriter, r *http.Request) {
-	followingIDStr := chi.URLParam(r, "id")
+	followingIDStr := chi.URLParam(r, "user_id")
 	followingID, err := uuid.Parse(followingIDStr)
 	if err != nil {
 		render.Error(w, http.StatusBadRequest, "无效的用户 ID")
@@ -71,13 +71,13 @@ func (h *FollowHandler) Follow(w http.ResponseWriter, r *http.Request) {
 //	@Summary	取消关注
 //	@Tags		follows
 //	@Security	BearerAuth
-//	@Param		id	path		string	true	"目标用户 ID"
-//	@Success	200	{object}	render.Response[followResponse]
-//	@Failure	400	{object}	render.errorResponse
-//	@Failure	500	{object}	render.errorResponse
-//	@Router		/users/{id}/follow [delete]
+//	@Param		user_id	path		string	true	"目标用户 ID"
+//	@Success	200		{object}	render.Response[followResponse]
+//	@Failure	400		{object}	render.errorResponse
+//	@Failure	500		{object}	render.errorResponse
+//	@Router		/users/{user_id}/follow [delete]
 func (h *FollowHandler) Unfollow(w http.ResponseWriter, r *http.Request) {
-	followingIDStr := chi.URLParam(r, "id")
+	followingIDStr := chi.URLParam(r, "user_id")
 	followingID, err := uuid.Parse(followingIDStr)
 	if err != nil {
 		render.Error(w, http.StatusBadRequest, "无效的用户 ID")
@@ -129,15 +129,15 @@ func toFollowUserResponse(u *db.ListFollowersRow) followUserResponse {
 //
 //	@Summary	获取粉丝列表
 //	@Tags		follows
-//	@Param		id			path		string	true	"用户 ID"
+//	@Param		user_id		path		string	true	"用户 ID"
 //	@Param		page		query		int		false	"页码"	default(1)
 //	@Param		page_size	query		int		false	"每页数量"	default(20)
 //	@Success	200			{object}	render.Response[[]followUserResponse]
 //	@Failure	400			{object}	render.errorResponse
 //	@Failure	500			{object}	render.errorResponse
-//	@Router		/users/{id}/followers [get]
+//	@Router		/users/{user_id}/followers [get]
 func (h *FollowHandler) ListFollowers(w http.ResponseWriter, r *http.Request) {
-	userIDStr := chi.URLParam(r, "id")
+	userIDStr := chi.URLParam(r, "user_id")
 	userID, err := uuid.Parse(userIDStr)
 	if err != nil {
 		render.Error(w, http.StatusBadRequest, "无效的用户 ID")
@@ -171,15 +171,15 @@ func (h *FollowHandler) ListFollowers(w http.ResponseWriter, r *http.Request) {
 //
 //	@Summary	获取关注列表
 //	@Tags		follows
-//	@Param		id			path		string	true	"用户 ID"
+//	@Param		user_id		path		string	true	"用户 ID"
 //	@Param		page		query		int		false	"页码"	default(1)
 //	@Param		page_size	query		int		false	"每页数量"	default(20)
 //	@Success	200			{object}	render.Response[[]followUserResponse]
 //	@Failure	400			{object}	render.errorResponse
 //	@Failure	500			{object}	render.errorResponse
-//	@Router		/users/{id}/following [get]
+//	@Router		/users/{user_id}/following [get]
 func (h *FollowHandler) ListFollowing(w http.ResponseWriter, r *http.Request) {
-	userIDStr := chi.URLParam(r, "id")
+	userIDStr := chi.URLParam(r, "user_id")
 	userID, err := uuid.Parse(userIDStr)
 	if err != nil {
 		render.Error(w, http.StatusBadRequest, "无效的用户 ID")

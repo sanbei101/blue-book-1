@@ -157,20 +157,20 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 //
 //	@Summary	获取用户资料
 //	@Tags		users
-//	@Param		id	path		string	true	"用户 ID"
-//	@Success	200	{object}	render.Response[userResponse]
-//	@Failure	400	{object}	render.errorResponse
-//	@Failure	404	{object}	render.errorResponse
-//	@Router		/users/{id} [get]
+//	@Param		user_id	path		string	true	"用户 ID"
+//	@Success	200		{object}	render.Response[userResponse]
+//	@Failure	400		{object}	render.errorResponse
+//	@Failure	404		{object}	render.errorResponse
+//	@Router		/users/{user_id} [get]
 func (h *UserHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
-	idStr := chi.URLParam(r, "id")
-	id, err := uuid.Parse(idStr)
+	userIDStr := chi.URLParam(r, "user_id")
+	userID, err := uuid.Parse(userIDStr)
 	if err != nil {
 		render.Error(w, http.StatusBadRequest, "无效的用户 ID")
 		return
 	}
 
-	user, err := h.store.GetUserByID(r.Context(), id)
+	user, err := h.store.GetUserByID(r.Context(), userID)
 	if err != nil {
 		render.Error(w, http.StatusNotFound, "用户不存在")
 		return
