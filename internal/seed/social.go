@@ -10,7 +10,12 @@ import (
 )
 
 // seedLikes 创建种子点赞(帖子点赞 + 评论点赞)
-func (s *Seeder) seedLikes(ctx context.Context, users []db.User, posts []db.Post, comments []db.Comment) ([]db.Like, error) {
+func (s *Seeder) seedLikes(
+	ctx context.Context,
+	users []db.User,
+	posts []db.Post,
+	comments []db.Comment,
+) ([]db.Like, error) {
 	likes := make([]db.Like, 0)
 	seen := make(map[string]bool)
 

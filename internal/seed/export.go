@@ -10,7 +10,15 @@ import (
 )
 
 // ExportSQL 导出种子数据为 SQL 文件
-func ExportSQL(filename string, users []db.User, posts []db.Post, media []db.PostMedium, comments []db.Comment, likes []db.Like, follows []db.Follow) error {
+func ExportSQL(
+	filename string,
+	users []db.User,
+	posts []db.Post,
+	media []db.PostMedium,
+	comments []db.Comment,
+	likes []db.Like,
+	follows []db.Follow,
+) error {
 	var sb strings.Builder
 
 	sb.WriteString("-- Seed data generated at " + time.Now().Format(time.RFC3339) + "\n")
@@ -146,7 +154,7 @@ func ExportSQL(filename string, users []db.User, posts []db.Post, media []db.Pos
 	sb.WriteString("SET session_replication_role = 'origin';\n")
 
 	// 写入文件
-	return os.WriteFile(filename, []byte(sb.String()), 0644)
+	return os.WriteFile(filename, []byte(sb.String()), 0o644)
 }
 
 // escapeSQL 转义 SQL 字符串中的特殊字符

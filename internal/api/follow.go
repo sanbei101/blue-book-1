@@ -102,13 +102,13 @@ func (h *FollowHandler) Unfollow(w http.ResponseWriter, r *http.Request) {
 
 type followUserResponse struct {
 	// 用户 ID
-	ID        uuid.UUID `json:"id"`
+	ID uuid.UUID `json:"id"`
 	// 用户名
-	Username  string    `json:"username"`
+	Username string `json:"username"`
 	// 头像地址
-	AvatarURL string    `json:"avatar_url,omitempty"`
+	AvatarURL string `json:"avatar_url,omitempty"`
 	// 个人简介
-	Bio       string    `json:"bio,omitempty"`
+	Bio string `json:"bio,omitempty"`
 }
 
 func toFollowUserResponse(u *db.ListFollowersRow) followUserResponse {

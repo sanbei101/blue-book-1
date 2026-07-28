@@ -4,9 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/phuslu/log"
-
 	"github.com/google/uuid"
+	"github.com/phuslu/log"
 
 	"github.com/sanbei101/blue-book/internal/db"
 )

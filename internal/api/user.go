@@ -32,20 +32,20 @@ type registerRequest struct {
 
 type authResponse struct {
 	// JWT token
-	Token string       `json:"token"`
+	Token string `json:"token"`
 	// 用户信息
-	User  userResponse `json:"user"`
+	User userResponse `json:"user"`
 }
 
 type userResponse struct {
 	// 用户 ID
-	ID        uuid.UUID `json:"id"`
+	ID uuid.UUID `json:"id"`
 	// 用户名
-	Username  string    `json:"username"`
+	Username string `json:"username"`
 	// 头像地址
-	AvatarURL string    `json:"avatar_url,omitempty"`
+	AvatarURL string `json:"avatar_url,omitempty"`
 	// 个人简介
-	Bio       string    `json:"bio,omitempty"`
+	Bio string `json:"bio,omitempty"`
 }
 
 func toUserResponse(u *db.User) userResponse {
@@ -183,11 +183,11 @@ func (h *UserHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
 
 type updateProfileRequest struct {
 	// 用户名
-	Username  string `json:"username"   validate:"required,min=3,max=32"`
+	Username string `json:"username" validate:"required,min=3,max=32"`
 	// 头像 URL
 	AvatarURL string `json:"avatar_url"`
 	// 个人简介
-	Bio       string `json:"bio"        validate:"max=200"`
+	Bio string `json:"bio" validate:"max=200"`
 }
 
 // 更新用户资料

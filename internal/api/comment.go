@@ -78,17 +78,17 @@ type commentResponse struct {
 	// 用户 ID
 	UserID uuid.UUID `json:"user_id"`
 	// 父评论 ID,顶级评论为 nil
-	ParentID       *uuid.UUID `json:"parent_id,omitempty"`
+	ParentID *uuid.UUID `json:"parent_id,omitempty"`
 	// 评论内容
-	Content        string     `json:"content"`
+	Content string `json:"content"`
 	// 点赞数
-	LikeCount      int32      `json:"like_count"`
+	LikeCount int32 `json:"like_count"`
 	// 作者用户名
-	AuthorUsername string     `json:"author_username"`
+	AuthorUsername string `json:"author_username"`
 	// 作者头像地址
-	AuthorAvatar   string     `json:"author_avatar,omitempty"`
+	AuthorAvatar string `json:"author_avatar,omitempty"`
 	// 创建时间
-	CreatedAt      time.Time  `json:"created_at"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 // 获取帖子评论列表
