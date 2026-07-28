@@ -23,6 +23,7 @@ func main() {
 		log.Error().Err(err).Msg("无法连接数据库")
 		return
 	}
+	log.Info().Msg("数据库连接成功")
 	defer pool.Close()
 
 	store := db.NewStore(pool)
