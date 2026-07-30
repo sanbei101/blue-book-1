@@ -19,8 +19,12 @@ github.com/jackc/puddle/v2 v2.2.2 h1:PR8nw+E/1w0GLuRFSmiioY6UooMp6KJv0/61nB7icHo
 github.com/jackc/puddle/v2 v2.2.2/go.mod h1:vriiEXHvEE654aYKXXjOvZM39qJ0q+azkZFrfEOc3H4=
 github.com/kamalyes/go-argus v0.2.1 h1:OYIrKjNtjbGCBcVKPS1poNCegvgwJYOfXVp/8+x/tiM=
 github.com/kamalyes/go-argus v0.2.1/go.mod h1:dG5ttCh6wVn1u5qq4NEvoFtibgQ5Bj3PT8rw7HKX8c0=
+github.com/kamalyes/go-argus v0.3.0 h1:fNYc4Sp76MNeId6OLuN7z7NkCTlUXlKqldQHLwaJmNI=
+github.com/kamalyes/go-argus v0.3.0/go.mod h1:dG5ttCh6wVn1u5qq4NEvoFtibgQ5Bj3PT8rw7HKX8c0=
 github.com/phuslu/log v1.0.127 h1:WDcEi5VHdBUjUtuQQ1rSQ8+WQbazJ/G404HjUF2aD1U=
 github.com/phuslu/log v1.0.127/go.mod h1:F8osGJADo5qLK/0F88djWwdyoZZ9xDJQL1HYRHFEkS0=
+github.com/phuslu/log v1.0.128 h1:g9dioj35SZiuFWBaIrHJjDyppIYdhhQpwZJ+DlLW//U=
+github.com/phuslu/log v1.0.128/go.mod h1:F8osGJADo5qLK/0F88djWwdyoZZ9xDJQL1HYRHFEkS0=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=

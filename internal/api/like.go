@@ -21,7 +21,7 @@ func NewLikeHandler(store *db.Store) *LikeHandler {
 
 type toggleLikeRequest struct {
 	// 目标 ID (帖子 ID 或 评论 ID)
-	TargetID uuid.UUID `json:"target_id" validate:"required,uuid"`
+	TargetID uuid.UUID `json:"target_id"`
 	// 目标类型 (1=帖子, 2=评论)
 	TargetType int16 `json:"target_type" validate:"required,oneof=1 2"`
 }
